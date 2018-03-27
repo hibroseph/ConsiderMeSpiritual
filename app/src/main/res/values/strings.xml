@@ -1,4 +1,5 @@
 <resources>
+
     <string name="app_name">Consider Me Spiritual</string>
     <string name="welcomeScreenDescription">In need of a quick spiritual fix? You\'ve come to the
     right place. Press Spiritualize me to find the correct quote in a jiffy</string>
@@ -6,18 +7,15 @@
     <string name="lol">You\'re spiritual!</string>
     <string name="submitButton">Submit</string>
     <string name="ratingbutton">Rate</string>
-
     <string name="chooseTopic">Choose a Topic</string>
     <string name="chooseAuthor">Choose an Author</string>
-
     <string name="scripture">Scripture</string>
     <string name="talk">Talk</string>
     <string name="generalAuthority">General Authority</string>
-
     <string name="findQuoteTitle">Find a Spiritual Thought:</string>
-
     <string name="actionGetQuote">Find Quote</string>
 
+    <!-- For the topic spinner -->
     <string-array name="Topics">
         <item>All</item>
         <item>Love</item>
@@ -29,6 +27,7 @@
         <item>God</item>
     </string-array>
 
+    <!-- For the author spinner -->
     <string-array name="Authors">
         <item>All</item>
         <item>Thomas S. Monson</item>
@@ -39,4 +38,5 @@
         <item>Todd D. Christoferson</item>
         <item>Neil A. Anderson</item>
     </string-array>
+
 </resources>

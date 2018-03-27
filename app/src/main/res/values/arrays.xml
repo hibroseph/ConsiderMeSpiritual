@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- The actual quotes that get displayed -->
     <array name="Quotes">
         <item>"It takes faith to believe that the resurrected Lord is watching over the daily details of His kingdom. It takes faith to believe that He calls imperfect people into positions of trust. It takes faith to believe that He knows the people He calls perfectly, both their capacities and their potential, and so makes no mistakes in His calls.
             - Henery B Eyring, "The Lord Leads His Church"</item>

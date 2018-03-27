@@ -19,7 +19,8 @@ import static joellc.considermespiritual.Database.getDatabase;
 
 /**
  * Created by Joseph on 2/16/2018.
- * Displays the menu to choose different options to fine tune your random quote generation
+ * Displays the menu to choose different options to specify your random quote generation so it
+ * isn't so random.
  */
 public class findQuoteActivity extends AppCompatActivity {
 
