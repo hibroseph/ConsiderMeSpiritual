@@ -1,0 +1,42 @@
+<resources>
+    <string name="app_name">Consider Me Spiritual</string>
+    <string name="welcomeScreenDescription">In need of a quick spiritual fix? You\'ve come to the
+    right place. Press Spiritualize me to find the correct quote in a jiffy</string>
+    <string name="quoteButton">Find Quote</string>
+    <string name="lol">You\'re spiritual!</string>
+    <string name="submitButton">Submit</string>
+    <string name="ratingbutton">Rate</string>
+
+    <string name="chooseTopic">Choose a Topic</string>
+    <string name="chooseAuthor">Choose an Author</string>
+
+    <string name="scripture">Scripture</string>
+    <string name="talk">Talk</string>
+    <string name="generalAuthority">General Authority</string>
+
+    <string name="findQuoteTitle">Find a Spiritual Thought:</string>
+
+    <string name="actionGetQuote">Find Quote</string>
+
+    <string-array name="Topics">
+        <item>All</item>
+        <item>Love</item>
+        <item>Discipleship</item>
+        <item>Jesus Christ</item>
+        <item>Baptism</item>
+        <item>Tithing</item>
+        <item>Gift of Holy Ghost</item>
+        <item>God</item>
+    </string-array>
+
+    <string-array name="Authors">
+        <item>All</item>
+        <item>Thomas S. Monson</item>
+        <item>Dieter F. Uchtdorf</item>
+        <item>Henery B. Eyring</item>
+        <item>Jeffery R. Holland</item>
+        <item>Ronald A. Rasband</item>
+        <item>Todd D. Christoferson</item>
+        <item>Neil A. Anderson</item>
+    </string-array>
+</resources>
