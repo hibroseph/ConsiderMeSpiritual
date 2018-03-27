@@ -39,4 +39,24 @@
         <item>Neil A. Anderson</item>
     </string-array>
 
+    <!-- The actual quotes that get displayed -->
+    <string-array name="Quotes">
+        <item>"It takes faith to believe that the resurrected Lord is watching over the daily details of His kingdom. It takes faith to believe that He calls imperfect people into positions of trust. It takes faith to believe that He knows the people He calls perfectly, both their capacities and their potential, and so makes no mistakes in His calls.
+            - Henery B Eyring, "The Lord Leads His Church"</item>
+        <item>"Love is expressed in many recognizable ways: a smile, a wave, a kind comment, a compliment. Other expressions may be more subtle, such as showing interest in another’s activities, teaching a principle with kindness and patience, visiting one who is ill or homebound. These words and actions and many others can communicate love.
+            - Thomas S. Monson, "Love - The Essence of the Gospel"</item>
+        <item>"There are those among you who, although young, have already suffered a full measure of grief and sorrow. My heart is filled with compassion and love for you. How dear you are to the Church. How beloved you are of your Heavenly Father. Though it may seem that you are alone, angels attend you. Though you may feel that no one can understand the depth of your despair, our Savior, Jesus Christ, understands. He suffered more than we can possibly imagine, and He did it for us; He did it for you. You are not alone.
+            —Dieter F. Uchtdorf, "Your Happily Ever After"</item>
+        <item>"Immersion in the scriptures is essential for spiritual nourishment. The word of God inspires commitment and acts as a healing balm for hurt feelings, anger, or disillusionment. When our commitment is diminished for any reason, part of the solution is repentance. Commitment and repentance are closely intertwined.
+            —Quentin L. Cook, "Can Ye Feel So Now?"</item>
+        <item>"I am grateful to the Lord for having touched my heart and for helping me to choose the better part—that which, so long as I strive for worthiness, cannot be taken from me. Being faithful to God as worthy members of His church, learning about Him and how to truly follow and worship Him, is more priceless than gold, silver, or diamonds.
+            —Claudio R. M. Costa, "Priceless Principles for Success"</item>
+        <item>"As we invest time in learning about the Savior and His atoning sacrifice, we are drawn to participate in another key element to accessing His power: we choose to have faith in Him and follow Him. True disciples of Jesus Christ are willing to stand out, speak up, and be different from the people of the world. They are undaunted, devoted, and courageous.
+            —Russell M. Nelson, "Drawing the Power of Jesus Christ into Our Lives"</item>
+        <item>"I testify that the Lord goes before your face whenever you are on His errand. Sometimes you will be the angel the Lord sends to bear others up. Sometimes you will be the one surrounded by angels who bear you up. But always you will have His Spirit to be in your heart, as you have been promised in every sacrament service. You have only to keep His commandments.
+            —President Henry B. Eyring, "Fear Not to Do Good"</item>
+        <item>"The kind of life you live, your disposition, your very nature, will be determined by your thoughts, of which your acts are but the outward expression. Thought is the seed of action. Character springs from the depths of the soul. You tell me what you think about when you do not have to think, and I’ll tell you what you are.
+            —David O. McKay, "Developing a Christlike Character"</item>
+    </string-array>
+
 </resources>

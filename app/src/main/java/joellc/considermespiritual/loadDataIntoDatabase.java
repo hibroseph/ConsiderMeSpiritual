@@ -12,6 +12,7 @@ import static java.lang.Boolean.TRUE;
 
 /**
  * Created by Joseph on 2/27/2018.
+ * Class that loads data that is stored in the resource files into the database.
  */
 public class loadDataIntoDatabase implements Runnable {
 
@@ -38,8 +39,10 @@ public class loadDataIntoDatabase implements Runnable {
 
         Resources res = context.getResources();
 
+        // Make a temporary spiritual token to hold the information that will be put into the database
         SpiritualToken st = new SpiritualToken();
 
+        // Get the string arrays from the resource files
         String[] authors = res.getStringArray(R.array.Authors);
         String[] topics = res.getStringArray(R.array.Topics);
         String[] quotes = res.getStringArray(R.array.Quotes);
@@ -59,7 +62,7 @@ public class loadDataIntoDatabase implements Runnable {
             Log.d(TAG, st.getQuote());
 
             // Add the spiritual token to the database (db = database st = SpiritualToken)
-            addSpiritualToken(db, st);
+            db.spiritualTokenDao().addSpiritualToken(st);
         }
     }
 
@@ -82,7 +85,6 @@ public class loadDataIntoDatabase implements Runnable {
         db.spiritualTokenDao().nukeTable();
 
         // Generate Test Data
-
         if (db.spiritualTokenDao().getAuthors().isEmpty()) {
             Log.d(TAG, "Populating with new data per getAuthors is empty");
             populateWithTestData(db);
