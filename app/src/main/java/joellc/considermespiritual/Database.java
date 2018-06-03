@@ -8,7 +8,9 @@ import android.view.ContextMenu;
 import static java.sql.Types.NULL;
 
 /**
- * Representing the database  that will store all of the key and values. Based on the singleton
+ * Created by Joseph Ridgley on 2/26/2018
+ * Updated by Joseph Ridgley on 6/2/2018
+ * Representing the database that will store all of the key and values. Based on the singleton
  * pattern so only one database is instantiated.
  */
 class Database {

@@ -4,11 +4,25 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
 /**
- * Created by Joseph on 2/26/2018.
+ * Created by Joseph Ridgley on 2/26/2018.
+ * Updated by Joseph Ridgley on 6/2/2018.
+ * A SpiritualToken represents a piece of spiritual advise that usually comes in the form of a
+ * quote from a general authority or a scripture.
+ *
+ * Represents a table within the room database.
+ * This was created by following the instructions on how to create a room database
+ * https://developer.android.com/training/data-storage/room/
  */
 
 @Entity
 public class SpiritualToken {
+
+    SpiritualToken() {
+        topic = null;
+        talk = false;
+        scripture = false;
+    }
+
     @PrimaryKey(autoGenerate = true)
     private int ID;
 
@@ -23,7 +37,6 @@ public class SpiritualToken {
 
     @ColumnInfo
     private Boolean talk;
-
 
     @ColumnInfo(name = "scripture")
     private Boolean scripture;

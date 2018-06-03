@@ -6,6 +6,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+/**
+ * Created by Joseph Ridgley on 2/26/2018
+ * Updated by Joseph Ridgley on 6/3/2018
+ *
+ * This is the activty that is used to display the spiritual token to the user
+ */
 public class showQuoteActivity extends AppCompatActivity {
 
     TextView showQuote;
@@ -30,12 +36,16 @@ public class showQuoteActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                String[] quote = new String[1];
+//                String[] quote = new String[1];
+//                String[] author = new String[1];
+                SpiritualToken[] ST = new SpiritualToken[1];
 
                 Thread t = new Thread() {
                     @Override
                     public void run() {
-                        quote[0] = quoteDatabase.spiritualTokenDao().getQuote();
+//                        quote[0] = quoteDatabase.spiritualTokenDao().getQuote();
+//                        author[0] = quoteDatabase.spiritualTokenDao().
+                        ST[0] = quoteDatabase.spiritualTokenDao().getSpiritualToken();
                     }
                 };
                 t.start();
@@ -48,7 +58,7 @@ public class showQuoteActivity extends AppCompatActivity {
                 }
 
                 // Set the text of textView to the new quote
-                showQuote.setText(quote[0]);
+                showQuote.setText(ST[0].getQuote() + " " + ST[0].getAuthor());
 
                 // Rinse and repeat
             }
