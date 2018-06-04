@@ -10,14 +10,17 @@ import android.widget.TextView;
  * Created by Joseph Ridgley on 2/26/2018
  * Updated by Joseph Ridgley on 6/3/2018
  *
- * This is the activty that is used to display the spiritual token to the user
+ * This is the activity that is used to display the spiritual token to the user
  */
 public class showQuoteActivity extends AppCompatActivity {
 
-    TextView showQuote;
+    TextView quote;
+    TextView author;
+
     Button findQuote;
 
     String Quote;
+    String Author;
 
     private AppDatabase quoteDatabase;
     private Database database;
@@ -28,10 +31,11 @@ public class showQuoteActivity extends AppCompatActivity {
         setContentView(R.layout.activity_show_quote);
 
         // Reference the TextView on the .xml file
-        showQuote = findViewById(R.id.textViewShowQuote);
+        quote = findViewById(R.id.textViewQuote);
+        author = findViewById(R.id.textViewAuthor);
         findQuote = findViewById(R.id.buttonFindQuote);
 
-        // Set an onClickListner to the button to generate a new quote
+        // When the user clicks the find a quote button to get a new one randomly
         findQuote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -58,16 +62,19 @@ public class showQuoteActivity extends AppCompatActivity {
                 }
 
                 // Set the text of textView to the new quote
-                showQuote.setText(ST[0].getQuote() + " " + ST[0].getAuthor());
-
+                quote.setText(ST[0].getQuote());
+                author.setText(ST[0].getAuthor());
                 // Rinse and repeat
             }
         });
 
-        // Save the quote that was sent over by the findQuoteActivity
+        // Get the information that was sent over the intent (such as the quote and author)
         Quote = getIntent().getStringExtra("QUOTE");
-        // Change the text of the TextView to the quote
-        showQuote.setText(Quote);
+        Author = getIntent().getStringExtra("AUTHOR");
+
+        // Change the text of the TextView's to the information provided
+        quote.setText(Quote);
+        author.setText(Author);
 
         // Put the database in a variable we can use easily
         quoteDatabase = database.getInstance(getApplicationContext());

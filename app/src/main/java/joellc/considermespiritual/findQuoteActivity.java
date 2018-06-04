@@ -50,6 +50,8 @@ public class findQuoteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.find_quote);
 
+
+
         // Create a thread to download the quotes and scriptures from Firebase.
         Thread downloadQuotesThread = new Thread(new Runnable() {
             @Override
@@ -117,8 +119,7 @@ public class findQuoteActivity extends AppCompatActivity {
                 String TAG = "startShowQuoteActivity";
 
                 // String to test as the quote
-                final String[] quote = new String[500];
-
+                final SpiritualToken[] ST = new SpiritualToken[1];
                 // Load the Data Access Object to something direct that we can use
                 // STD = Spiritual Token DAO, not Sexually Transmitted Disease
 //                final SpiritualTokenDao STD = quoteDatabase.spiritualTokenDao();
@@ -127,7 +128,7 @@ public class findQuoteActivity extends AppCompatActivity {
                 Thread t = new Thread() {
                     @Override
                     public void run() {
-                        quote[0] = Database.getDatabase(getApplicationContext()).spiritualTokenDao().getQuote();
+                        ST[0] = Database.getDatabase(getApplicationContext()).spiritualTokenDao().getSpiritualToken();
                     }
                 };
 
@@ -142,7 +143,8 @@ public class findQuoteActivity extends AppCompatActivity {
 
                 // Create the new intent and give it the quote to display
                 Intent intent = new Intent(findQuoteActivity.this, showQuoteActivity.class);
-                intent.putExtra("QUOTE", quote[0]);
+                intent.putExtra("QUOTE", ST[0].getQuote());
+                intent.putExtra("AUTHOR", ST[0].getAuthor());
 
                 // Start that bad boy
                 startActivity(intent);
