@@ -4,6 +4,8 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,6 +38,14 @@ public interface SpiritualTokenDao {
     // This deletes the whole database. PLEASE BE CAREFUL. THERE AINT NO TURNING BACK FROM THIS.
     @Query("DELETE FROM SpiritualToken")
     public void nukeTable();
+
+    // Get the number of authors
+    @Query("SELECT count(author) FROM SpiritualToken")
+    public int getAuthorCount();
+
+    // Get the number of quotes
+    @Query("SELECT count(quote) FROM SpiritualToken")
+    public int getQuoteCount();
 
     // How a quote or scripture is added to the database
     @Insert

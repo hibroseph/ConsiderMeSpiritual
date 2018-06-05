@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -37,9 +39,6 @@ public class findQuoteActivity extends AppCompatActivity {
     private Database database;
     private Button findQuote;
 
-    // How to access the object
-    //private SpiritualTokenDao STD = Database.getDatabase(getApplicationContext()).spiritualTokenDao().;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // For log messages
@@ -50,7 +49,32 @@ public class findQuoteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.find_quote);
 
+        // Let's clear the table so that we know we have a clean playing field
+        // DESTROY THE TABLE
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Database.getDatabase(getApplicationContext()).spiritualTokenDao().nukeTable();
+            }
+        }).start();
 
+
+        // This is used to notify us when the data is downloaded per threads are failing me
+        final OnDataDownloaded firebaseFinishListener = new OnDataDownloaded() {
+            String TAG = "OnDataDownloaded";
+
+            @Override
+            public void onSuccess() {
+                Log.d(TAG, "All the data has been downloaded from Firebase!");
+                LoadSpinners();
+            }
+
+            @Override
+            public void onFailure() {
+                Log.d(TAG, "Something went amiss! Uh-Oh! I haven't programmed to print out " +
+                        "problems yet so I'm sorry! Start searching for your bug");
+            }
+        };
 
         // Create a thread to download the quotes and scriptures from Firebase.
         Thread downloadQuotesThread = new Thread(new Runnable() {
@@ -68,18 +92,19 @@ public class findQuoteActivity extends AppCompatActivity {
                         // I think it does according to the documentation
 
                         Log.d(TAG, "The path quotes has: " + dataSnapshot.getChildrenCount() +
-                        " children. Let's loop through them all to download them");
+                                " children. Let's loop through them all to download them");
 
                         // Find out how many we need to loop through
                         int childrenCount = (int) dataSnapshot.getChildrenCount();
 
                         // Loop through all the children to download them
                         for (Integer i = 0; i < childrenCount; i++) {
-                            Log.d(TAG, "I would be downloading child: " +  i.toString());
+                            Log.d(TAG, "I would be downloading child: " + i.toString());
                             SpiritualToken st = dataSnapshot.child(i.toString()).getValue(SpiritualToken.class);
 
                             Log.d(TAG, "The quote for child: " + i.toString() + " is: " +
-                            st.getQuote());
+                                    st.getQuote());
+
 
                             // Add them to the database on the phone in a new thread.
                             Thread loadTokensIntoDatabase = new Thread(new Runnable() {
@@ -92,6 +117,10 @@ public class findQuoteActivity extends AppCompatActivity {
                             loadTokensIntoDatabase.start();
 
                         }
+
+                        // By time the code runs here, it should be done.
+                        Log.d(TAG, "I think the firebase has finished loading data");
+                        firebaseFinishListener.onSuccess();
                     }
 
                     @Override
@@ -99,8 +128,9 @@ public class findQuoteActivity extends AppCompatActivity {
                         // This shouldn't run but if it does, bad things happened that need to be
                         // researched
 
-                        Log.d(TAG, "BAD STUFF HAPPENED " + databaseError.getDetails() );
+                        Log.d(TAG, "BAD STUFF HAPPENED " + databaseError.getDetails());
                     }
+
                 });
             }
         });
@@ -108,6 +138,7 @@ public class findQuoteActivity extends AppCompatActivity {
         // Start the thread
         Log.d(TAG, "Starting the thread");
         downloadQuotesThread.start();
+
 
         // While the thread was starting for loading the spinners
         findQuote = findViewById(R.id.buttonFindQuote);
@@ -120,9 +151,6 @@ public class findQuoteActivity extends AppCompatActivity {
 
                 // String to test as the quote
                 final SpiritualToken[] ST = new SpiritualToken[1];
-                // Load the Data Access Object to something direct that we can use
-                // STD = Spiritual Token DAO, not Sexually Transmitted Disease
-//                final SpiritualTokenDao STD = quoteDatabase.spiritualTokenDao();
 
                 // Create a thread to get the Randomly generated quote.
                 Thread t = new Thread() {
@@ -153,42 +181,93 @@ public class findQuoteActivity extends AppCompatActivity {
         });
 
         // Wait for the thread to finish
-//        Log.d(TAG, "Waiting for the thread to finish before loading spinners");
-//        try {
-//            //databaseThread.join();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//        Log.d(TAG, "Thread has finished, loading spinners");
+        Log.d(TAG, "Waiting for the thread to finish before loading spinners");
+
+        Log.d(TAG, "Is the downloadQuotesThread alive? " + downloadQuotesThread.isAlive());
+
+        try {
+            downloadQuotesThread.join();
+            Log.d(TAG, "Is the downloadQuotesThread alive? " + downloadQuotesThread.isAlive());
+            Log.d(TAG, "Downloading the quotes thread has finished!");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Loads the spinners when called. The idea is that this will get called once all the data from
+     * Firebase has been loading.
+     */
+    public void LoadSpinners() {
+        String TAG = "LoadSpinners";
+
+        Thread getAuthorCount = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int numOfAuthors = Database.getDatabase(getApplicationContext()).spiritualTokenDao()
+                        .getAuthorCount();
+
+                int numOfQuotes = Database.getDatabase(getApplicationContext()).spiritualTokenDao()
+                        .getAuthorCount();
+
+                // Print out how many you have of the authors and of the quotes
+                Log.d(TAG, "Number of authors: " + numOfAuthors);
+                Log.d(TAG, "Number of quotes: " + numOfQuotes);
+
+            }
+        });
+        getAuthorCount.start();
+
+
+//        // Find the topic spinner
+//        Spinner spinnerTopic = (Spinner) findViewById(R.id.spinnerTopic);
 //
-//        Log.d(TAG, "Number of authors: " + LDID.getAuthors());
-//        Log.d(TAG, "Number of topics: " + LDID.getTopics());
-
-        // Get the topic spinner
-        Resources res = getResources();
-        String[] Topics = res.getStringArray(R.array.Topics);
-
-        // Find the topic spinner
-        Spinner spinnerTopic = (Spinner) findViewById(R.id.spinnerTopic);
-
 //        // Create an adapter to display the information
 //        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
 //                android.R.layout.simple_spinner_item, LDID.getTopics());
-
 //        spinnerTopic.setAdapter(adapter);
 
-        // Get the author spinner
-        String[] Authors = res.getStringArray(R.array.Authors);
-        Spinner spinnerAuthor = (Spinner) findViewById(R.id.spinnerAuthor);
-
-        // Create an adapter for the author spinner
-//        ArrayAdapter<String> authorAdapter = new ArrayAdapter<String>(this,
-//                android.R.layout.simple_spinner_item, LDID.getAuthors());
+//        Handler handler = new Handler() {
+//            @Override
+//            public void updateAuthorSpinner(List<String> authors) {
+//                Spinner spinnerAuthor = (Spinner) findViewById(R.id.spinnerAuthor);
 //
-//        spinnerAuthor.setAdapter(authorAdapter);
+//                Log.d(TAG, "Updating the spinner LETS SEE IF THIS WORKS");
+//
+//                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
+//                        android.R.layout.simple_spinner_item, authors);
+//
+//                adapter.notifyDataSetChanged();
+//
+//                spinnerAuthor.setAdapter(adapter);
+//            }
+//
+//        };
+//
+//        // Run a new thread to get all of the authors from the database
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//                List<String> authors = Database.getDatabase(getApplicationContext()).spiritualTokenDao().getAuthors();
+//
+//                Log.d(TAG, "Sending the authors over to the handler to update the spinner");
+//                handler.updateAuthorSpinner(authors);
+//            }
+//        }).start();
     }
 
- }
+    /**
+     * A listener made to help when when data is downloaded. This was made directly for Firebase
+     * downloading quotes but this might be made more abstract much later when I see more purpose
+     * for this listener
+     */
+    public interface Handler {
+        void updateAuthorSpinner(List<String> authors);
+    }
 
-
-
+    public interface OnDataDownloaded {
+        void onSuccess();
+        void onFailure();
+    }
+}
