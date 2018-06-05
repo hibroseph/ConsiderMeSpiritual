@@ -7,6 +7,7 @@ import android.arch.persistence.room.Query;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Joseph Ridgley on 2/26/2018.
@@ -19,11 +20,11 @@ import java.util.List;
 public interface SpiritualTokenDao {
 
     // All of these are pretty obvious what they do.
-    @Query("SELECT topic FROM SpiritualToken")
-    List<String> getTopics();
+    @Query("SELECT DISTINCT topic FROM SpiritualToken WHERE topic IS NOT NULL")
+    List<String> getUniqueTopics();
 
-    @Query("SELECT author FROM SpiritualToken")
-    List<String> getAuthors();
+    @Query("SELECT DISTINCT author FROM SpiritualToken WHERE author IS NOT NULL")
+    List<String> getUniqueAuthors();
 
     @Query("SELECT quote FROM SpiritualToken")
     List<String> getQuotes();

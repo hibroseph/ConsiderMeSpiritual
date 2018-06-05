@@ -22,6 +22,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
@@ -57,6 +58,8 @@ public class findQuoteActivity extends AppCompatActivity {
                 Database.getDatabase(getApplicationContext()).spiritualTokenDao().nukeTable();
             }
         }).start();
+
+
 
 
         // This is used to notify us when the data is downloaded per threads are failing me
@@ -218,43 +221,72 @@ public class findQuoteActivity extends AppCompatActivity {
         });
         getAuthorCount.start();
 
+        // Run a new thread to get all of the topics from the database
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // Get a unique list of authors from the database
+                List<String> topics = Database.getDatabase(getApplicationContext()).spiritualTokenDao().getUniqueTopics();
 
-//        // Find the topic spinner
-//        Spinner spinnerTopic = (Spinner) findViewById(R.id.spinnerTopic);
-//
-//        // Create an adapter to display the information
-//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-//                android.R.layout.simple_spinner_item, LDID.getTopics());
-//        spinnerTopic.setAdapter(adapter);
+                // Sort the list
+                java.util.Collections.sort(topics);
 
-//        Handler handler = new Handler() {
-//            @Override
-//            public void updateAuthorSpinner(List<String> authors) {
-//                Spinner spinnerAuthor = (Spinner) findViewById(R.id.spinnerAuthor);
-//
-//                Log.d(TAG, "Updating the spinner LETS SEE IF THIS WORKS");
-//
-//                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
-//                        android.R.layout.simple_spinner_item, authors);
-//
-//                adapter.notifyDataSetChanged();
-//
-//                spinnerAuthor.setAdapter(adapter);
-//            }
-//
-//        };
-//
-//        // Run a new thread to get all of the authors from the database
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//                List<String> authors = Database.getDatabase(getApplicationContext()).spiritualTokenDao().getAuthors();
-//
-//                Log.d(TAG, "Sending the authors over to the handler to update the spinner");
-//                handler.updateAuthorSpinner(authors);
-//            }
-//        }).start();
+                Log.d(TAG, "The size of the topic list before adding 'All': " + topics.size());
+
+                // Add an option for all topics in the spinner
+                topics.add(0, "All");
+
+                Log.d(TAG, "The size of the topic list after adding 'All': " + topics.size());
+
+                Log.d(TAG, "Let's update the spinner!");
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Find the topic spinner
+                        Spinner spinnerTopic = (Spinner) findViewById(R.id.spinnerTopic);
+
+                        // Create an adapter to display the information
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
+                                android.R.layout.simple_spinner_item, topics);
+
+                        spinnerTopic.setAdapter(adapter);
+                    }
+                });
+            }
+        }).start();
+
+        // Run a new thread to get all of the authors from the database
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // Get a unique list of authors from the database
+                List<String> authors = Database.getDatabase(getApplicationContext()).spiritualTokenDao().getUniqueAuthors();
+
+                // Sort the authors to be in alphabetical order
+                java.util.Collections.sort(authors);
+
+                // Add an option for all authors in the spinner
+                authors.add(0, "All");
+
+                Log.d(TAG, "Updating the spinner. Fingers crossed");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Spinner spinnerAuthor = (Spinner) findViewById(R.id.spinnerAuthor);
+
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
+                                android.R.layout.simple_spinner_item, authors);
+
+                        //adapter.notifyDataSetChanged();
+
+
+                        spinnerAuthor.setAdapter(adapter);
+                    }
+                });
+
+            }
+        }).start();
     }
 
     /**
@@ -262,10 +294,6 @@ public class findQuoteActivity extends AppCompatActivity {
      * downloading quotes but this might be made more abstract much later when I see more purpose
      * for this listener
      */
-    public interface Handler {
-        void updateAuthorSpinner(List<String> authors);
-    }
-
     public interface OnDataDownloaded {
         void onSuccess();
         void onFailure();
