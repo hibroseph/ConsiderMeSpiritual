@@ -18,7 +18,7 @@ import android.arch.persistence.room.PrimaryKey;
 public class SpiritualToken {
 
     SpiritualToken() {
-        topic = null;
+        topic = "All";
         talk = false;
         scripture = false;
     }

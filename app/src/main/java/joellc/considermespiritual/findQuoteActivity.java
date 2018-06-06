@@ -30,7 +30,7 @@ import static joellc.considermespiritual.Database.getDatabase;
 
 /**
  * Created by Joseph on 2/16/2018.
- * Updated by Joseph Ridgley on 6/3/2018.
+ * Updated by Joseph Ridgley on 6/6/2018.
  * Displays the menu to choose different options to specify your random quote generation so it
  * isn't so random. This is the starting activity for the app.
  */
@@ -58,9 +58,6 @@ public class findQuoteActivity extends AppCompatActivity {
                 Database.getDatabase(getApplicationContext()).spiritualTokenDao().nukeTable();
             }
         }).start();
-
-
-
 
         // This is used to notify us when the data is downloaded per threads are failing me
         final OnDataDownloaded firebaseFinishListener = new OnDataDownloaded() {
@@ -152,34 +149,56 @@ public class findQuoteActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String TAG = "startShowQuoteActivity";
 
-                // String to test as the quote
-                final SpiritualToken[] ST = new SpiritualToken[1];
+                final String selectedAuthor = ((Spinner) findViewById(R.id.spinnerAuthor)).getSelectedItem().toString();
+                final String selectedTopic = ((Spinner) findViewById(R.id.spinnerTopic)).getSelectedItem().toString();
+
+                Log.d(TAG, "Your selected author is: " + selectedAuthor);
+                Log.d(TAG, "Your selected author is: " + selectedTopic);
+
+                // When the database has accessed the object that we need it to
+                OnDatabaseDone getSpiritualToken = new OnDatabaseDone() {
+                    @Override
+                    public void onSuccess(Object result) {
+
+                        // Create the new intent and give it the quote to display
+                        Intent intent = new Intent(findQuoteActivity.this, showQuoteActivity.class);
+
+                        // We can assume here that the results will be spiritual tokens.
+                        intent.putExtra("QUOTE", ((SpiritualToken)result).getQuote());
+                        intent.putExtra("AUTHOR", ((SpiritualToken)result).getAuthor());
+
+                        // Start that bad boy
+                        startActivity(intent);
+                        finish();
+                    }
+                };
 
                 // Create a thread to get the Randomly generated quote.
                 Thread t = new Thread() {
                     @Override
                     public void run() {
-                        ST[0] = Database.getDatabase(getApplicationContext()).spiritualTokenDao().getSpiritualToken();
+                        Log.d(TAG, "We are going to start to access the database");
+
+                        SpiritualToken result;
+
+                        if(selectedAuthor.contains("All")) {
+                            Log.d(TAG, "The selected Author was all, getting all authors");
+                            result = Database.getDatabase(getApplicationContext())
+                                    .spiritualTokenDao().getSpiritualTokenWithTopic(selectedTopic);
+                        } else {
+                            Log.d(TAG, "The selected Author was not all, getting author: " + selectedAuthor);
+                            result = Database.getDatabase(getApplicationContext())
+                                    .spiritualTokenDao().getSpecificSpiritualToken(selectedAuthor, selectedTopic);
+                        }
+
+                        Log.d(TAG, "This shouldn't display till the result has been returned, let's see");
+                        Log.d(TAG, "Result Author: " + result.getAuthor() + " - " + result.getQuote());
+
+                        // Notify that we have gotten the spiritual token
+                        getSpiritualToken.onSuccess(result);
                     }
                 };
-
                 t.start();
-
-                // Wait for the thread to finish.
-                try {
-                    t.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                // Create the new intent and give it the quote to display
-                Intent intent = new Intent(findQuoteActivity.this, showQuoteActivity.class);
-                intent.putExtra("QUOTE", ST[0].getQuote());
-                intent.putExtra("AUTHOR", ST[0].getAuthor());
-
-                // Start that bad boy
-                startActivity(intent);
-                finish();
             }
         });
 
@@ -231,12 +250,11 @@ public class findQuoteActivity extends AppCompatActivity {
                 // Sort the list
                 java.util.Collections.sort(topics);
 
-                Log.d(TAG, "The size of the topic list before adding 'All': " + topics.size());
-
-                // Add an option for all topics in the spinner
-                topics.add(0, "All");
-
-                Log.d(TAG, "The size of the topic list after adding 'All': " + topics.size());
+                // Add an option for all topics in the spinner if it isn't already there
+                if (!topics.contains("All")) {
+                    Log.d(TAG, "Topics does not contain the world All, adding all");
+                    topics.add(0, "All");
+                }
 
                 Log.d(TAG, "Let's update the spinner!");
 
@@ -297,5 +315,9 @@ public class findQuoteActivity extends AppCompatActivity {
     public interface OnDataDownloaded {
         void onSuccess();
         void onFailure();
+    }
+
+    public interface OnDatabaseDone<T> {
+        void onSuccess(T result);
     }
 }

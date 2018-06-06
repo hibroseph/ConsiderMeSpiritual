@@ -11,7 +11,7 @@ import java.util.Set;
 
 /**
  * Created by Joseph Ridgley on 2/26/2018.
- * Updated by Joseph Ridgley on 6/3/2018.
+ * Updated by Joseph Ridgley on 6/6/2018.
  *
  * This 'dao' (Direct Access Object) are the methods that are available to you to access and
  * manipulate the database.
@@ -35,6 +35,19 @@ public interface SpiritualTokenDao {
     // Selects a spiritual token by random
     @Query("SELECT * FROM SpiritualToken ORDER BY RANDOM() LIMIT 1")
     SpiritualToken getSpiritualToken();
+
+    // Selects a token with a specific author and topic
+    @Query("SELECT * FROM SpiritualToken WHERE author = :requestedAuthor AND topic = :requestedTopic LIMIT 1")
+    SpiritualToken getSpecificSpiritualToken(String requestedAuthor, String requestedTopic);
+
+    // Selects a token with a specific topic
+    @Query("SELECT * From SpiritualToken WHERE topic = :requestedTopic LIMIT 1")
+    SpiritualToken getSpiritualTokenWithTopic(String requestedTopic);
+
+    // Selects a token with a specific author
+    @Query("SELECT * From SpiritualToken WHERE author = :requestedAuthor LIMIT 1")
+    SpiritualToken getSpiritualTokenWithAuthor(String requestedAuthor);
+
 
     // This deletes the whole database. PLEASE BE CAREFUL. THERE AINT NO TURNING BACK FROM THIS.
     @Query("DELETE FROM SpiritualToken")
