@@ -2,6 +2,7 @@ package joellc.considermespiritual;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
 
 /**
  * Created by Joseph Ridgley on 2/26/2018.
@@ -23,8 +24,8 @@ public class SpiritualToken {
         scripture = false;
     }
 
-    @PrimaryKey(autoGenerate = true)
-    private int ID;
+    @PrimaryKey @NonNull
+    private String ID;
 
     @ColumnInfo
     private String topic;
@@ -41,11 +42,22 @@ public class SpiritualToken {
     @ColumnInfo(name = "scripture")
     private Boolean scripture;
 
-    public int getID() {
+    @ColumnInfo
+    private String FirebaseID;
+
+    public String getFirebaseID() {
+        return FirebaseID;
+    }
+
+    public void setFirebaseID(String firebaseID) {
+        FirebaseID = firebaseID;
+    }
+
+    public String getID() {
         return ID;
     }
 
-    public void setID(int id) { ID = id;}
+    public void setID(String id) { ID = id;}
 
     public String getTopic() {
         return topic;

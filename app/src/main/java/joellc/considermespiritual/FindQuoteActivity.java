@@ -1,12 +1,7 @@
 package joellc.considermespiritual;
 
-import android.arch.persistence.room.Room;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -20,13 +15,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static joellc.considermespiritual.Database.getDatabase;
 
 /**
  * Created by Joseph on 2/16/2018.
@@ -34,11 +25,54 @@ import static joellc.considermespiritual.Database.getDatabase;
  * Displays the menu to choose different options to specify your random quote generation so it
  * isn't so random. This is the starting activity for the app.
  */
-public class findQuoteActivity extends AppCompatActivity {
 
-    private AppDatabase quoteDatabase;
-    private Database database;
-    private Button findQuote;
+
+public class FindQuoteActivity extends AppCompatActivity {
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        String TAG = "onStart";
+
+        Log.d(TAG, "onStart was called");
+
+        Spinner spinnerAuthor = (Spinner) findViewById(R.id.spinnerAuthor);
+
+        Spinner spinnerTopic = (Spinner) findViewById(R.id.spinnerTopic);
+
+        LoadSpinners();
+        // A way to see if the user selects something on the spinners
+//        spinnerAuthor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+//                Log.d(TAG, "An item was selected");
+//                // update the topic spinner
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> adapterView) {
+//
+//            }
+//        });
+//
+//        spinnerTopic.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+//                Log.d(TAG, "A new topic was selected");
+//
+//                // update the author spinner accordingly
+//                loadTopicSpinner((String)spinnerTopic.getSelectedItem());
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> adapterView) {
+//
+//            }
+//        });
+//        LoadSpinners();
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +82,12 @@ public class findQuoteActivity extends AppCompatActivity {
         Log.d(TAG, "Let's make sure this message displays, ya know, to see if its working");
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.find_quote);
+        setContentView(R.layout.activity_find_quote);
+
+        setSupportActionBar(findViewById(R.id.ActivityFindQuoteToolbar));
+
+        // Make Firebase accessible offline
+        //FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
         // Let's clear the table so that we know we have a clean playing field
         // DESTROY THE TABLE
@@ -81,15 +120,14 @@ public class findQuoteActivity extends AppCompatActivity {
             @Override
             public void run() {
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
+
                 // Get a reference to the Firebase where the quotes are stored.
                 DatabaseReference databaseRef = database.getReference("Quotes");
 
                 databaseRef.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        // This is where the data should be get saved into the database.
-                        // I am going to test around with the dataSnapshot to see if works like
-                        // I think it does according to the documentation
+                        // This is where the data should get saved into the database.
 
                         Log.d(TAG, "The path quotes has: " + dataSnapshot.getChildrenCount() +
                                 " children. Let's loop through them all to download them");
@@ -97,14 +135,52 @@ public class findQuoteActivity extends AppCompatActivity {
                         // Find out how many we need to loop through
                         int childrenCount = (int) dataSnapshot.getChildrenCount();
 
+
+                        for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+
+                            //Log.d(TAG, "A KEY: " + postSnapshot.getKey());
+
+                            // Get child at specific address
+                            SpiritualToken st = dataSnapshot.child(postSnapshot.getKey()).getValue(SpiritualToken.class);
+
+                            Log.d(TAG, "Quote: " + st.getQuote());
+                            Log.d(TAG, "Firebase ID: " + st.getFirebaseID());
+
+                            // Check to see if you have a scripture
+                            if(st.getAuthor().matches(".*\\d.*")) {
+                                Log.d(TAG, "THIS CONTAINS A NUMBER. SCRIPTURE");
+                                Log.d(TAG, "See if I am wrong, is it a scripture? " + st.getAuthor());
+                                st.setScripture(TRUE);
+                            }
+
+                            Thread loadTokensIntoDatabase = new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Database.getDatabase(getApplicationContext()).spiritualTokenDao().addSpiritualToken(st);
+                                }
+                            });
+
+                            loadTokensIntoDatabase.start();
+                        }
+
+                        /*
                         // Loop through all the children to download them
                         for (Integer i = 0; i < childrenCount; i++) {
+
                             Log.d(TAG, "I would be downloading child: " + i.toString());
                             SpiritualToken st = dataSnapshot.child(i.toString()).getValue(SpiritualToken.class);
 
                             Log.d(TAG, "The quote for child: " + i.toString() + " is: " +
                                     st.getQuote());
 
+                            Log.d(TAG, "Whats the Firebase id? " + st.getFirebaseID());
+                            // If it contains a number, it's a scripture (if this doesn't work later on
+                            // I can make it a number and a colon :)
+                            if(st.getAuthor().matches(".*\\d.*")) {
+                                Log.d(TAG, "THIS CONTAINS A NUMBER. SCRIPTURE");
+                                Log.d(TAG, "See if I am wrong, is it a scripture? " + st.getAuthor());
+                                st.setScripture(TRUE);
+                            }
 
                             // Add them to the database on the phone in a new thread.
                             Thread loadTokensIntoDatabase = new Thread(new Runnable() {
@@ -117,11 +193,11 @@ public class findQuoteActivity extends AppCompatActivity {
                             loadTokensIntoDatabase.start();
 
                         }
-
-                        // By time the code runs here, it should be done.
-                        Log.d(TAG, "I think the firebase has finished loading data");
-                        firebaseFinishListener.onSuccess();
-                    }
+                        */
+                            // By time the code runs here, it should be done.
+                            Log.d(TAG, "I think the firebase has finished loading data");
+                            firebaseFinishListener.onSuccess();
+                        }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
@@ -141,7 +217,7 @@ public class findQuoteActivity extends AppCompatActivity {
 
 
         // While the thread was starting for loading the spinners
-        findQuote = findViewById(R.id.buttonFindQuote);
+        Button findQuote = findViewById(R.id.buttonFindQuote);
 
         // Attach a onClickListner to the button to find a quote when it's pressed
         findQuote.setOnClickListener(new View.OnClickListener() {
@@ -161,15 +237,19 @@ public class findQuoteActivity extends AppCompatActivity {
                     public void onSuccess(Object result) {
 
                         // Create the new intent and give it the quote to display
-                        Intent intent = new Intent(findQuoteActivity.this, showQuoteActivity.class);
+                        Intent intent = new Intent(FindQuoteActivity.this, ShowQuoteActivity.class);
+
+                        Log.d(TAG, "Let's hope this thing has an ID: " + ((SpiritualToken)result).getID());
 
                         // We can assume here that the results will be spiritual tokens.
                         intent.putExtra("QUOTE", ((SpiritualToken)result).getQuote());
                         intent.putExtra("AUTHOR", ((SpiritualToken)result).getAuthor());
+                        // The String value of is neccessary because getID returns an int
+                        intent.putExtra("ID", String.valueOf(((SpiritualToken)result).getID()));
 
                         // Start that bad boy
                         startActivity(intent);
-                        finish();
+                        //finish();
                     }
                 };
 
@@ -240,44 +320,21 @@ public class findQuoteActivity extends AppCompatActivity {
         });
         getAuthorCount.start();
 
-        // Run a new thread to get all of the topics from the database
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                // Get a unique list of authors from the database
-                List<String> topics = Database.getDatabase(getApplicationContext()).spiritualTokenDao().getUniqueTopics();
+        // Load the individual spinners
+        loadAuthorSpinner();
+        loadTopicSpinner();
 
-                // Sort the list
-                java.util.Collections.sort(topics);
 
-                // Add an option for all topics in the spinner if it isn't already there
-                if (!topics.contains("All")) {
-                    Log.d(TAG, "Topics does not contain the world All, adding all");
-                    topics.add(0, "All");
-                }
+    }
 
-                Log.d(TAG, "Let's update the spinner!");
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Find the topic spinner
-                        Spinner spinnerTopic = (Spinner) findViewById(R.id.spinnerTopic);
-
-                        // Create an adapter to display the information
-                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
-                                android.R.layout.simple_spinner_item, topics);
-
-                        spinnerTopic.setAdapter(adapter);
-                    }
-                });
-            }
-        }).start();
+    public void loadAuthorSpinner() {
+        String TAG = "loadAuthorSpinner";
 
         // Run a new thread to get all of the authors from the database
         new Thread(new Runnable() {
             @Override
             public void run() {
+
                 // Get a unique list of authors from the database
                 List<String> authors = Database.getDatabase(getApplicationContext()).spiritualTokenDao().getUniqueAuthors();
 
@@ -293,16 +350,67 @@ public class findQuoteActivity extends AppCompatActivity {
                     public void run() {
                         Spinner spinnerAuthor = (Spinner) findViewById(R.id.spinnerAuthor);
 
-                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getBaseContext(),
                                 android.R.layout.simple_spinner_item, authors);
 
                         //adapter.notifyDataSetChanged();
-
 
                         spinnerAuthor.setAdapter(adapter);
                     }
                 });
 
+            }
+        }).start();
+
+    }
+
+    public void loadTopicSpinner() {
+        String TAG = "loadTopicSpinner";
+
+        Spinner spinnerTopic = (Spinner) findViewById(R.id.spinnerTopic);
+
+        // Run a new thread to get all of the topics from the database
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                // Get a unique list of authors from the database
+                List<String> topics = Database.getDatabase(getApplicationContext()).spiritualTokenDao().getUniqueTopics();
+                // Sort the list
+                java.util.Collections.sort(topics);
+
+                // Add an option for all topics in the spinner if it isn't already there
+                if (!topics.contains("All")) {
+                    Log.d(TAG, "Topics does not contain the world All, adding all");
+                    topics.add(0, "All");
+                }
+
+                Log.d(TAG, "Does the topic list contain lol hi");
+
+                if (topics.contains("lol hi")) {
+                     Log.d(TAG, "IT DOES CONTAIN LOL HI, THIS MEANS WE ARE DOING SUMTHIN RITE");
+                } else {
+                    Log.d(TAG, "k idk if we are doing this right");
+                }
+
+                Log.d(TAG, "Let's update the spinner!");
+
+                // Attach a listener to the spinner to know when the user selects something
+
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Find the topic spinneR
+                        Spinner spinnerTopic = (Spinner) findViewById(R.id.spinnerTopic);
+
+                        // Create an adapter to display the information
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getBaseContext(),
+                                android.R.layout.simple_spinner_item, topics);
+
+                        spinnerTopic.setAdapter(adapter);
+                    }
+                });
             }
         }).start();
     }
@@ -317,7 +425,4 @@ public class findQuoteActivity extends AppCompatActivity {
         void onFailure();
     }
 
-    public interface OnDatabaseDone<T> {
-        void onSuccess(T result);
-    }
 }

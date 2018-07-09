@@ -4,10 +4,9 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Update;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by Joseph Ridgley on 2/26/2018.
@@ -23,8 +22,11 @@ public interface SpiritualTokenDao {
     @Query("SELECT DISTINCT topic FROM SpiritualToken WHERE topic IS NOT NULL")
     List<String> getUniqueTopics();
 
-    @Query("SELECT DISTINCT author FROM SpiritualToken WHERE author IS NOT NULL")
+    @Query("SELECT DISTINCT author FROM SpiritualToken WHERE author IS NOT NULL AND scripture = 0")
     List<String> getUniqueAuthors();
+
+    @Query("SELECT DISTINCT topic FROM SpiritualToken WHERE topic IS NOT NULL AND author = :specificAuthor")
+    List<String> getSpecificTopics(String specificAuthor);
 
     @Query("SELECT quote FROM SpiritualToken")
     List<String> getQuotes();
@@ -41,13 +43,12 @@ public interface SpiritualTokenDao {
     SpiritualToken getSpecificSpiritualToken(String requestedAuthor, String requestedTopic);
 
     // Selects a token with a specific topic
-    @Query("SELECT * From SpiritualToken WHERE topic = :requestedTopic LIMIT 1")
+    @Query("SELECT * From SpiritualToken WHERE topic = :requestedTopic ORDER BY RANDOM() LIMIT 1")
     SpiritualToken getSpiritualTokenWithTopic(String requestedTopic);
 
     // Selects a token with a specific author
-    @Query("SELECT * From SpiritualToken WHERE author = :requestedAuthor LIMIT 1")
+    @Query("SELECT * From SpiritualToken WHERE author = :requestedAuthor ORDER BY RANDOM() LIMIT 1")
     SpiritualToken getSpiritualTokenWithAuthor(String requestedAuthor);
-
 
     // This deletes the whole database. PLEASE BE CAREFUL. THERE AINT NO TURNING BACK FROM THIS.
     @Query("DELETE FROM SpiritualToken")
@@ -61,6 +62,9 @@ public interface SpiritualTokenDao {
     @Query("SELECT count(quote) FROM SpiritualToken")
     public int getQuoteCount();
 
+    @Query("UPDATE SpiritualToken SET topic = :newTopic WHERE ID = :ID")
+    public void updateTopic(String newTopic, String ID);
+
     // How a quote or scripture is added to the database
     @Insert
     void addSpiritualToken(SpiritualToken st);
@@ -68,6 +72,5 @@ public interface SpiritualTokenDao {
     // You can delete by author
     @Delete
     void deleteSpiritualTokenByAuthor(SpiritualToken st);
-
 
 }
