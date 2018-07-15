@@ -16,7 +16,7 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
     <Button
-        android:id="@+id/buttonFindQuote"
+        android:id="@+id/buttonFragFindQuote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -111,5 +111,17 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ActivityFindQuoteToolbar" />
+
+    <Button
+        android:id="@+id/startFragmentActivity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="New Activity"
+        app:layout_constraintEnd_toEndOf="@+id/buttonFragFindQuote"
+        app:layout_constraintStart_toStartOf="@+id/buttonFragFindQuote"
+        app:layout_constraintTop_toBottomOf="@+id/buttonFragFindQuote" />
 
 </android.support.constraint.ConstraintLayout>

@@ -22,6 +22,8 @@ public class SpiritualToken {
         topic = "All";
         talk = false;
         scripture = false;
+        quote = "NA";
+        author = "NA";
     }
 
     @PrimaryKey @NonNull

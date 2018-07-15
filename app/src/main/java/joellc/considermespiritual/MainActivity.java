@@ -1,8 +1,12 @@
 package joellc.considermespiritual;
 
-import android.content.Intent;
-import android.os.Bundle;
+import android.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -15,79 +19,58 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.Boolean.TRUE;
 
-/**
- * Created by Joseph on 2/16/2018.
- * Updated by Joseph Ridgley on 6/6/2018.
- * Displays the menu to choose different options to specify your random quote generation so it
- * isn't so random. This is the starting activity for the app.
- */
+public class MainActivity extends AppCompatActivity {
 
 
-public class FindQuoteActivity extends AppCompatActivity {
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        String TAG = "onStart";
-
-        Log.d(TAG, "onStart was called");
-
-        Spinner spinnerAuthor = (Spinner) findViewById(R.id.spinnerAuthor);
-
-        Spinner spinnerTopic = (Spinner) findViewById(R.id.spinnerTopic);
-
-        LoadSpinners();
-        // A way to see if the user selects something on the spinners
-//        spinnerAuthor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-//                Log.d(TAG, "An item was selected");
-//                // update the topic spinner
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> adapterView) {
-//
-//            }
-//        });
-//
-//        spinnerTopic.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-//                Log.d(TAG, "A new topic was selected");
-//
-//                // update the author spinner accordingly
-//                loadTopicSpinner((String)spinnerTopic.getSelectedItem());
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> adapterView) {
-//
-//            }
-//        });
-//        LoadSpinners();
-
-    }
+    OnDataDownloaded download;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // For log messages
-        String TAG = "onCreate";
-
-        Log.d(TAG, "Let's make sure this message displays, ya know, to see if its working");
-
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_find_quote);
+        setContentView(R.layout.activity_main);
 
-        setSupportActionBar(findViewById(R.id.ActivityFindQuoteToolbar));
+        setSupportActionBar(findViewById(R.id.toolbar));
 
-        // Make Firebase accessible offline
-        //FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        String TAG = "MainActivity";
+
+        Log.d(TAG, "OnCreate");
+
+        // Create an instance of the SearchForQuoteFragment
+        SearchForQuoteFragment searchForQuoteFragment = new SearchForQuoteFragment();
+
+        // Get the fragment manager
+        FragmentManager fragmentManager = this.getSupportFragmentManager();
+
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        // Add the fragment
+        fragmentTransaction.add(R.id.FrameLayout, new SearchForQuoteFragment(), "frag1")
+                .commit();
+
+        Button findQuote = findViewById(R.id.   buttonFragFindQuote);
+
+        Log.d(TAG, "Setting up the RecyclerView");
+
+        RecyclerView rv = findViewById(R.id.recyclerView);
+
+        // This is to make the scrolling smooth
+        rv.setNestedScrollingEnabled(false);
+
+        LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
+
+        rv.setLayoutManager(llm);
+
+        ArrayList<SpiritualToken> spiritualTokens = new ArrayList<>();
+
+        RVAdapter adapter = new RVAdapter(spiritualTokens);
+
+        rv.setAdapter(adapter);
+
 
         // Let's clear the table so that we know we have a clean playing field
         // DESTROY THE TABLE
@@ -98,22 +81,6 @@ public class FindQuoteActivity extends AppCompatActivity {
             }
         }).start();
 
-        // This is used to notify us when the data is downloaded per threads are failing me
-        final OnDataDownloaded firebaseFinishListener = new OnDataDownloaded() {
-            String TAG = "OnDataDownloaded";
-
-            @Override
-            public void onSuccess() {
-                Log.d(TAG, "All the data has been downloaded from Firebase!");
-                LoadSpinners();
-            }
-
-            @Override
-            public void onFailure() {
-                Log.d(TAG, "Something went amiss! Uh-Oh! I haven't programmed to print out " +
-                        "problems yet so I'm sorry! Start searching for your bug");
-            }
-        };
 
         // Create a thread to download the quotes and scriptures from Firebase.
         Thread downloadQuotesThread = new Thread(new Runnable() {
@@ -138,11 +105,12 @@ public class FindQuoteActivity extends AppCompatActivity {
 
                         for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
 
-                            //Log.d(TAG, "A KEY: " + postSnapshot.getKey());
+                            Log.d(TAG, "A KEY: " + postSnapshot.getKey());
 
                             // Get child at specific address
                             SpiritualToken st = dataSnapshot.child(postSnapshot.getKey()).getValue(SpiritualToken.class);
 
+                            st.setFirebaseID(postSnapshot.getKey());
                             Log.d(TAG, "Quote: " + st.getQuote());
                             Log.d(TAG, "Firebase ID: " + st.getFirebaseID());
 
@@ -194,10 +162,14 @@ public class FindQuoteActivity extends AppCompatActivity {
 
                         }
                         */
-                            // By time the code runs here, it should be done.
-                            Log.d(TAG, "I think the firebase has finished loading data");
-                            firebaseFinishListener.onSuccess();
-                        }
+                        // By time the code runs here, it should be done.
+                        Log.d(TAG, "I think the firebase has finished loading data");
+
+                        // Let's tell the fragment that we are done downloading
+                        SearchForQuoteFragment searchForQuoteFragment1 = (SearchForQuoteFragment) getSupportFragmentManager().findFragmentByTag("frag1");
+                        searchForQuoteFragment1.onSuccess();
+
+                    }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
@@ -216,84 +188,10 @@ public class FindQuoteActivity extends AppCompatActivity {
         downloadQuotesThread.start();
 
 
-        // While the thread was starting for loading the spinners
-        Button findQuote = findViewById(R.id.buttonFindQuote);
 
-        // Attach a onClickListner to the button to find a quote when it's pressed
-        findQuote.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String TAG = "startShowQuoteActivity";
 
-                final String selectedAuthor = ((Spinner) findViewById(R.id.spinnerAuthor)).getSelectedItem().toString();
-                final String selectedTopic = ((Spinner) findViewById(R.id.spinnerTopic)).getSelectedItem().toString();
 
-                Log.d(TAG, "Your selected author is: " + selectedAuthor);
-                Log.d(TAG, "Your selected author is: " + selectedTopic);
 
-                // When the database has accessed the object that we need it to
-                OnDatabaseDone getSpiritualToken = new OnDatabaseDone() {
-                    @Override
-                    public void onSuccess(Object result) {
-
-                        // Create the new intent and give it the quote to display
-                        Intent intent = new Intent(FindQuoteActivity.this, ShowQuoteActivity.class);
-
-                        Log.d(TAG, "Let's hope this thing has an ID: " + ((SpiritualToken)result).getID());
-
-                        // We can assume here that the results will be spiritual tokens.
-                        intent.putExtra("QUOTE", ((SpiritualToken)result).getQuote());
-                        intent.putExtra("AUTHOR", ((SpiritualToken)result).getAuthor());
-                        // The String value of is neccessary because getID returns an int
-                        intent.putExtra("ID", String.valueOf(((SpiritualToken)result).getID()));
-
-                        // Start that bad boy
-                        startActivity(intent);
-                        //finish();
-                    }
-                };
-
-                // Create a thread to get the Randomly generated quote.
-                Thread t = new Thread() {
-                    @Override
-                    public void run() {
-                        Log.d(TAG, "We are going to start to access the database");
-
-                        SpiritualToken result;
-
-                        if(selectedAuthor.contains("All")) {
-                            Log.d(TAG, "The selected Author was all, getting all authors");
-                            result = Database.getDatabase(getApplicationContext())
-                                    .spiritualTokenDao().getSpiritualTokenWithTopic(selectedTopic);
-                        } else {
-                            Log.d(TAG, "The selected Author was not all, getting author: " + selectedAuthor);
-                            result = Database.getDatabase(getApplicationContext())
-                                    .spiritualTokenDao().getSpecificSpiritualToken(selectedAuthor, selectedTopic);
-                        }
-
-                        Log.d(TAG, "This shouldn't display till the result has been returned, let's see");
-                        Log.d(TAG, "Result Author: " + result.getAuthor() + " - " + result.getQuote());
-
-                        // Notify that we have gotten the spiritual token
-                        getSpiritualToken.onSuccess(result);
-                    }
-                };
-                t.start();
-            }
-        });
-
-        // Wait for the thread to finish
-        Log.d(TAG, "Waiting for the thread to finish before loading spinners");
-
-        Log.d(TAG, "Is the downloadQuotesThread alive? " + downloadQuotesThread.isAlive());
-
-        try {
-            downloadQuotesThread.join();
-            Log.d(TAG, "Is the downloadQuotesThread alive? " + downloadQuotesThread.isAlive());
-            Log.d(TAG, "Downloading the quotes thread has finished!");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -388,7 +286,7 @@ public class FindQuoteActivity extends AppCompatActivity {
                 Log.d(TAG, "Does the topic list contain lol hi");
 
                 if (topics.contains("lol hi")) {
-                     Log.d(TAG, "IT DOES CONTAIN LOL HI, THIS MEANS WE ARE DOING SUMTHIN RITE");
+                    Log.d(TAG, "IT DOES CONTAIN LOL HI, THIS MEANS WE ARE DOING SUMTHIN RITE");
                 } else {
                     Log.d(TAG, "k idk if we are doing this right");
                 }
@@ -415,14 +313,5 @@ public class FindQuoteActivity extends AppCompatActivity {
         }).start();
     }
 
-    /**
-     * A listener made to help when when data is downloaded. This was made directly for Firebase
-     * downloading quotes but this might be made more abstract much later when I see more purpose
-     * for this listener
-     */
-    public interface OnDataDownloaded {
-        void onSuccess();
-        void onFailure();
-    }
 
 }
