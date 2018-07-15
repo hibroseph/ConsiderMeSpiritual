@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -19,27 +20,26 @@ import java.util.List;
 
 import static android.content.ContentValues.TAG;
 
-
+/**
+ * This fragment is used to show the neccsary elements to search for an element including the
+ * spinners, check buttons, and search button
+ */
 public class SearchForQuoteFragment extends android.support.v4.app.Fragment implements OnDataDownloaded{
 
     String TAG = "SearchForQuoteFragment";
 
-    View view;
+    View v;
     RecyclerView rv;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstances) {
 
         Log.d(TAG, "onCreateView: Does this get called everytime to get created");
 
-        if (getActivity() instanceof OnDataDownloaded) {
-            Log.d(TAG, "There is an instance of it");
-            OnDataDownloaded dataDownloaded = (OnDataDownloaded) getActivity();
-        }
+        v = inflater.inflate(R.layout.fragment_search_for_quote, container, false);
 
-        view = inflater.inflate(R.layout.fragment_search_for_quote, container, false);
-
-        Button findQuote = view.findViewById(R.id.buttonFragFindQuote);
+        Button findQuote = v.findViewById(R.id.buttonFragFindQuote);
 
         rv = getActivity().findViewById(R.id.recyclerView);
 
@@ -54,8 +54,8 @@ public class SearchForQuoteFragment extends android.support.v4.app.Fragment impl
                 if(ra == null)
                     Log.e(TAG, "onClick: RecyclerView adapter should not be equal to null");
 
-                final String selectedAuthor = ((Spinner) getView().findViewById(R.id.spinnerAuthor)).getSelectedItem().toString();
-                final String selectedTopic = ((Spinner) getView().findViewById(R.id.spinnerTopic)).getSelectedItem().toString();
+                final String selectedAuthor = ((Spinner) v.findViewById(R.id.spinnerAuthor)).getSelectedItem().toString();
+                final String selectedTopic = ((Spinner) v.findViewById(R.id.spinnerTopic)).getSelectedItem().toString();
 
                 Log.d(TAG, "Your selected author is: " + selectedAuthor);
                 Log.d(TAG, "Your selected author is: " + selectedTopic);
@@ -89,16 +89,25 @@ public class SearchForQuoteFragment extends android.support.v4.app.Fragment impl
                             @Override
                             public void run() {
                                 ra.notifyDataSetChanged();
+
+                                NestedScrollView nsv = getActivity().findViewById(R.id.NestedScrollView);
+
+                                // This is used to scroll to the bottom of the view
+                                nsv.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        nsv.fullScroll(View.FOCUS_DOWN);
+                                    }
+                                });
                             }
-                        });
+ });
                     }
                 };
                 t.start();
 
-//                ra.insert(new SpiritualToken());
             }
         });
-        return view;
+        return v;
     }
 
     public void loadSpinnerz() {
@@ -157,7 +166,7 @@ public class SearchForQuoteFragment extends android.support.v4.app.Fragment impl
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Spinner spinnerAuthor = (Spinner) view.findViewById(R.id.spinnerAuthor);
+                        Spinner spinnerAuthor = (Spinner) getView().findViewById(R.id.spinnerAuthor);
 
                         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity().getBaseContext(),
                                 android.R.layout.simple_spinner_item, authors);
@@ -176,7 +185,7 @@ public class SearchForQuoteFragment extends android.support.v4.app.Fragment impl
     public void loadTopicSpinner() {
         String TAG = "loadTopicSpinner";
 
-        Spinner spinnerTopic = (Spinner) view.findViewById(R.id.spinnerTopic);
+        Spinner spinnerTopic = (Spinner) v.findViewById(R.id.spinnerTopic);
 
         // Run a new thread to get all of the topics from the database
         new Thread(new Runnable() {
@@ -211,7 +220,7 @@ public class SearchForQuoteFragment extends android.support.v4.app.Fragment impl
                     @Override
                     public void run() {
                         // Find the topic spinneR
-                        Spinner spinnerTopic = (Spinner) view.findViewById(R.id.spinnerTopic);
+                        Spinner spinnerTopic = (Spinner) v.findViewById(R.id.spinnerTopic);
 
                         // Create an adapter to display the information
                         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity().getBaseContext(),

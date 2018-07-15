@@ -29,13 +29,17 @@
                 android:id="@+id/quote"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="quote" />
+                android:text="quote"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/author"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="author" />
+                android:text="author"
+                android:textSize="18sp"
+                android:textStyle="italic" />
         </LinearLayout>
     </android.support.v7.widget.CardView>
 
