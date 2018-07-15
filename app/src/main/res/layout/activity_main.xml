@@ -2,9 +2,26 @@
 
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/floatingActionButtonScrollToTop"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:clickable="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="5dp"
+        android:elevation="3dp"
+        android:visibility="visible"
+
+        app:layout_anchor="@id/recyclerView"
+
+        app:layout_anchorGravity="bottom|right|end"
+        app:srcCompat="@drawable/baseline_search_white_24dp"
+        tools:layout_editor_absoluteY="8dp" />
 
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/NestedScrollView"

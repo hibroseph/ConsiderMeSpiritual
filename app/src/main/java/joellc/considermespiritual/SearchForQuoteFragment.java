@@ -110,10 +110,6 @@ public class SearchForQuoteFragment extends android.support.v4.app.Fragment impl
         return v;
     }
 
-    public void loadSpinnerz() {
-        Log.d(TAG, "Here we would load the spinnerz");
-    }
-
     /**
      * Loads the spinners when called. The idea is that this will get called once all the data from
      * Firebase has been loading.

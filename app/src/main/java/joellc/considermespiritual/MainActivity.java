@@ -1,13 +1,16 @@
 package joellc.considermespiritual;
 
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.Button;
+import android.view.View;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -21,8 +24,7 @@ import static java.lang.Boolean.TRUE;
 
 public class MainActivity extends AppCompatActivity {
 
-
-    OnDataDownloaded download;
+    NestedScrollView nsv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +37,8 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d(TAG, "OnCreate");
 
-        // Create an instance of the SearchForQuoteFragment
-        SearchForQuoteFragment searchForQuoteFragment = new SearchForQuoteFragment();
+        // Set the reference to the nested scroll view
+        nsv = findViewById(R.id.NestedScrollView);
 
         // Get the fragment manager
         FragmentManager fragmentManager = this.getSupportFragmentManager();
@@ -46,8 +48,6 @@ public class MainActivity extends AppCompatActivity {
         // Add the fragment
         fragmentTransaction.add(R.id.FrameLayout, new SearchForQuoteFragment(), "frag1")
                 .commit();
-
-        Button findQuote = findViewById(R.id.buttonFragFindQuote);
 
         Log.d(TAG, "Setting up the RecyclerView");
 
@@ -94,9 +94,6 @@ public class MainActivity extends AppCompatActivity {
                         Log.d(TAG, "The path quotes has: " + dataSnapshot.getChildrenCount() +
                                 " children. Let's loop through them all to download them");
 
-                        // Find out how many we need to loop through
-                        int childrenCount = (int) dataSnapshot.getChildrenCount();
-
 
                         for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
 
@@ -105,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
                             // Get child at specific address
                             SpiritualToken st = dataSnapshot.child(postSnapshot.getKey()).getValue(SpiritualToken.class);
 
+                            //TODO: Add exception handling for the setFirebaseID
                             st.setFirebaseID(postSnapshot.getKey());
                             Log.d(TAG, "Quote: " + st.getQuote());
                             Log.d(TAG, "Firebase ID: " + st.getFirebaseID());
@@ -150,6 +148,33 @@ public class MainActivity extends AppCompatActivity {
         // Start the thread
         Log.d(TAG, "Starting the thread");
         downloadQuotesThread.start();
+
+        FloatingActionButton fab = findViewById(R.id.floatingActionButtonScrollToTop);
+
+        fab.hide();
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "You clicked the FAB");
+
+                // Top?
+                nsv.scrollTo(0,0);
+            }
+        });
+
+        nsv.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                Log.d(TAG, "You are scrolling");
+                Log.d(TAG, "You are at position " + scrollY);
+                if (scrollY > 639 && fab.getVisibility() != View.VISIBLE) {
+                    fab.show();
+                } else if (scrollY <639 && fab.getVisibility() == View.VISIBLE) {
+                    fab.hide();
+                }
+            }
+        });
     }
 
 }
