@@ -41,7 +41,7 @@ public class SearchForQuoteFragment extends android.support.v4.app.Fragment impl
 
         Button findQuote = v.findViewById(R.id.buttonFragFindQuote);
 
-        rv = getActivity().findViewById(R.id.recyclerView);
+        loadAuthorSpinner();
 
         // When someone clicks the button to find a quote
         findQuote.setOnClickListener(new View.OnClickListener() {
@@ -65,22 +65,16 @@ public class SearchForQuoteFragment extends android.support.v4.app.Fragment impl
                     public void run() {
                         Log.d(TAG, "We are going to start to access the database");
 
-                        SpiritualToken result;
+                        SpiritualToken result = null;
 
-                        if(selectedAuthor.contains("All")) {
-                            Log.d(TAG, "The selected Author was all, getting all authors");
+                        if(result.getAuthor().equals("All")) {
                             result = Database.getDatabase(getActivity().getApplicationContext())
-                                    .spiritualTokenDao().getSpiritualTokenWithTopic(selectedTopic);
+                                    .spiritualTokenDao().getSpiritualToken();
+
                         } else {
-                            Log.d(TAG, "The selected Author was not all, getting author: " + selectedAuthor);
                             result = Database.getDatabase(getActivity().getApplicationContext())
-                                    .spiritualTokenDao().getSpecificSpiritualToken(selectedAuthor, selectedTopic);
+                                    .spiritualTokenDao().getSpiritualTokenWithAuthor(selectedAuthor);
                         }
-
-                        Log.d(TAG, "This shouldn't display till the result has been returned, let's see");
-                        Log.d(TAG, "Result Author: " + result.getAuthor() + " - " + result.getQuote());
-
-                        // Notify that we have gotten the spiritual token
 
                         ra.insert(result);
 
@@ -90,15 +84,15 @@ public class SearchForQuoteFragment extends android.support.v4.app.Fragment impl
                             public void run() {
                                 ra.notifyDataSetChanged();
 
-                                NestedScrollView nsv = getActivity().findViewById(R.id.NestedScrollView);
+//                                NestedScrollView nsv = getActivity().findViewById(R.id.NestedScrollView);
 
                                 // This is used to scroll to the bottom of the view
-                                nsv.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        nsv.fullScroll(View.FOCUS_DOWN);
-                                    }
-                                });
+//                                nsv.post(new Runnable() {
+//                                    @Override
+//                                    public void run() {
+//                                        nsv.fullScroll(View.FOCUS_DOWN);
+//                                    }
+//                                });
                             }
  });
                     }
@@ -136,8 +130,6 @@ public class SearchForQuoteFragment extends android.support.v4.app.Fragment impl
 
         // Load the individual spinners
         loadAuthorSpinner();
-        loadTopicSpinner();
-
 
     }
 
@@ -178,62 +170,9 @@ public class SearchForQuoteFragment extends android.support.v4.app.Fragment impl
 
     }
 
-    public void loadTopicSpinner() {
-        String TAG = "loadTopicSpinner";
-
-        Spinner spinnerTopic = (Spinner) v.findViewById(R.id.spinnerTopic);
-
-        // Run a new thread to get all of the topics from the database
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                // Get a unique list of authors from the database
-                List<String> topics = Database.getDatabase(getActivity().getApplicationContext()).spiritualTokenDao().getUniqueTopics();
-                // Sort the list
-                java.util.Collections.sort(topics);
-
-                // Add an option for all topics in the spinner if it isn't already there
-                if (!topics.contains("All")) {
-                    Log.d(TAG, "Topics does not contain the world All, adding all");
-                    topics.add(0, "All");
-                }
-
-                Log.d(TAG, "Does the topic list contain lol hi");
-
-                if (topics.contains("lol hi")) {
-                    Log.d(TAG, "IT DOES CONTAIN LOL HI, THIS MEANS WE ARE DOING SUMTHIN RITE");
-                } else {
-                    Log.d(TAG, "k idk if we are doing this right");
-                }
-
-                Log.d(TAG, "Let's update the spinner!");
-
-                // Attach a listener to the spinner to know when the user selects something
-
-
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Find the topic spinneR
-                        Spinner spinnerTopic = (Spinner) v.findViewById(R.id.spinnerTopic);
-
-                        // Create an adapter to display the information
-                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity().getBaseContext(),
-                                android.R.layout.simple_spinner_item, topics);
-
-                        spinnerTopic.setAdapter(adapter);
-                    }
-                });
-            }
-        }).start();
-    }
-
-
     @Override
     public void onSuccess() {
         loadAuthorSpinner();
-        loadTopicSpinner();
     }
 
     @Override

@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/refreshQuote"
-        android:icon="@drawable/outline_refresh_24"
+        android:icon="@drawable/refresh_icon_24"
         android:title="Refresh"
         android:visible="true"
         app:showAsAction="always|withText" />

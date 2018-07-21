@@ -19,6 +19,9 @@ allprojects {
     repositories {
         jcenter()
         google()
+
+        // Heart/Like button
+        maven { url "https://jitpack.io" }
     }
 }
 

@@ -1,12 +1,16 @@
 package joellc.considermespiritual;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Joseph Ridgley on 2/26/2018.
- * Updated by Joseph Ridgley on 6/2/2018.
+ * Updated by Joseph Ridgley on 7/18/2018.
  * A SpiritualToken represents a piece of spiritual advise that usually comes in the form of a
  * quote from a general authority or a scripture.
  *
@@ -19,18 +23,16 @@ import android.support.annotation.NonNull;
 public class SpiritualToken {
 
     SpiritualToken() {
-        topic = "All";
-        talk = false;
         scripture = false;
         quote = "NA";
         author = "NA";
+        favorite = false;
+        tags = new ArrayList<>();
     }
 
+    // This will be the Firebase ID
     @PrimaryKey @NonNull
     private String ID;
-
-    @ColumnInfo
-    private String topic;
 
     @ColumnInfo
     private String author;
@@ -39,35 +41,25 @@ public class SpiritualToken {
     private String quote;
 
     @ColumnInfo
-    private Boolean talk;
-
-    @ColumnInfo(name = "scripture")
     private Boolean scripture;
 
     @ColumnInfo
-    private String FirebaseID;
+    private boolean favorite;
 
-    public String getFirebaseID() {
-        return FirebaseID;
-    }
+    // I don't want the table that will be holding the spiritual tokens to hold the list of tags
+    // The tags will be held on a different table.
+    @Ignore
+    private List<String> tags;
 
-    public void setFirebaseID(String firebaseID) {
-        FirebaseID = firebaseID;
-    }
+    public List<String> getTags() { return tags; }
 
-    public String getID() {
-        return ID;
-    }
+    @NonNull
+    public void addTag(String tag) { tags.add(tag); }
 
-    public void setID(String id) { ID = id;}
+    @NonNull
+    public String getID() { return ID; }
 
-    public String getTopic() {
-        return topic;
-    }
-
-    public void setTopic(String topic) {
-        this.topic = topic;
-    }
+    public void setID(@NonNull String id) { ID = id;}
 
     public String getAuthor() {
         return author;
@@ -85,11 +77,12 @@ public class SpiritualToken {
         this.quote = quote;
     }
 
-    public Boolean getTalk() { return talk; }
-
-    public void setTalk(Boolean talk) { this.talk = talk; }
-
     public Boolean getScripture() { return scripture; }
 
     public void setScripture(Boolean scripture) { this.scripture = scripture; }
+
+    public boolean isFavorite() { return favorite; }
+
+    public void setFavorite(boolean favorite) { this.favorite = favorite; }
+
 }
