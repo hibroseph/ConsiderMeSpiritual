@@ -96,11 +96,6 @@ public class MainActivity extends AppCompatActivity {
                                 // Get child at specific address
                                 SpiritualToken st = dataSnapshot.child(postSnapshot.getKey()).getValue(SpiritualToken.class);
 
-//                            //TODO: Add exception handling for the setFirebaseID
-//                            st.setFirebaseID(postSnapshot.getKey());
-//                            Log.d(TAG, "Quote: " + st.getQuote());
-//                            Log.d(TAG, "Firebase ID: " + st.getFirebaseID());
-
                                 // Check to see if you have a scripture
                                 if (st.getAuthor().matches(".*\\d.*")) {
                                     Log.d(TAG, "THIS CONTAINS A NUMBER. SCRIPTURE");

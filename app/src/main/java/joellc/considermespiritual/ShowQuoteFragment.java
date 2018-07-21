@@ -11,6 +11,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.like.LikeButton;
+import com.like.OnLikeListener;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -27,6 +30,7 @@ public class ShowQuoteFragment extends android.support.v4.app.Fragment {
     @BindView(R.id.quote) TextView quoteTextView;
     @BindView(R.id.author) TextView authorTextView;
     @BindView(R.id.buttonFindQuote) Button findQuote;
+    @BindView(R.id.like_button) LikeButton likeButton;
 
     @Override
     public void onAttach(Context context) {
@@ -70,27 +74,7 @@ public class ShowQuoteFragment extends android.support.v4.app.Fragment {
 
                 Log.d(TAG, "Is the result equal to null? " + result);
 
-                if(result != null) {
-                    quote = result.getQuote();
-                    author = result.getAuthor();
-
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            quoteTextView.setText(quote);
-                            authorTextView.setText(author);
-                        }
-                    });
-                } else {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.d(TAG, "Your result to access the database was equal to null");
-                            quoteTextView.setText("Practice doesn't make perfect, Christ makes perfect");
-                            authorTextView.setText("Brad Wilcox");
-                        }
-                    });
-                }
+                showNewQuote(result);
 
             }
         };
@@ -101,11 +85,112 @@ public class ShowQuoteFragment extends android.support.v4.app.Fragment {
         return view;
     }
 
+    /**
+     * Method to replace the quote that is show on the screen
+     * @param spiritualToken The token that you would like to display
+     */
+    public void showNewQuote(SpiritualToken spiritualToken) {
+
+        // Set the liked button to what we have saved
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                likeButton.setLiked(spiritualToken.isFavorite());
+            }
+        });
+
+
+        likeButton.setOnLikeListener(new OnLikeListener() {
+            @Override
+            public void liked(LikeButton likeButton) {
+                Log.d(TAG, "You liked this quote");
+                Log.d(TAG, "Let's just make sure it was the correct quote");
+                Log.d(TAG, "Quote: " + spiritualToken.getQuote());
+
+                // Update the database that you like it
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Database.getDatabase(getActivity().getApplicationContext())
+                                .spiritualTokenDao().updateFavorite(spiritualToken.getID(), true);
+
+                        Log.d(TAG, "Database updated");
+
+                    }
+                }).start();
+            }
+
+            @Override
+            public void unLiked(LikeButton likeButton) {
+                Log.d(TAG, "Uh-oh, you unliked this quote");
+                Log.d(TAG, "Let's just make sure it was the correct quote");
+                Log.d(TAG, "Quote: " + spiritualToken.getQuote());
+
+                Log.d(TAG, "Going to update the database that you do not like this quote");
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Database.getDatabase(getActivity().getApplicationContext())
+                                .spiritualTokenDao().updateFavorite(spiritualToken.getID(), false);
+
+                        Log.d(TAG, "Database updated!");
+                    }
+                }).start();
+            }
+        });
+
+        if(spiritualToken != null) {
+            String quote = spiritualToken.getQuote();
+            String author = spiritualToken.getAuthor();
+
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    quoteTextView.setText(quote);
+                    authorTextView.setText(author);
+                }
+            });
+        } else {
+            // Here is a default text to display just incase we can't get one from the database
+            Log.d(TAG, "Your result to access the database was equal to null");
+
+            // Little error message just to notify you
+            Log.e(TAG, "Was unable to get token from database, might want to see if either " +
+                    "Firebase is saving the data to the database or if the dao is correct");
+
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    quoteTextView.setText("Practice doesn't make perfect, Christ makes perfect");
+                    authorTextView.setText("Brad Wilcox");
+                }
+            });
+        }
+    }
+
+    /**
+     * When the button on the street is short clicked
+     */
     @OnClick(R.id.buttonFindQuote)
     public void findQuoteShortClick() {
         Log.d(TAG, "You Clicked the Find New Quote button quickly");
+
+        // Thread to grab new quote
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                SpiritualToken sp = Database.getDatabase(getActivity().getApplicationContext())
+                        .spiritualTokenDao().getSpiritualToken();
+
+                showNewQuote(sp);
+            }
+        }).start();
     }
 
+    /**
+     * When there is a long click. The idea is to bring up the filtering menu
+     * @return I really don't know what this is for, the code made me
+     */
     @OnLongClick(R.id.buttonFindQuote)
     public boolean findQuoteLongClick() {
         Log.d(TAG, "You did a looooong click on Find New Quote button");

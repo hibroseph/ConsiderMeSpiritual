@@ -4,29 +4,9 @@
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:id="@+id/card"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="vertical"
     app:ignore="NamespaceTypo">
-
-    <Button
-        android:id="@+id/buttonFindQuote"
-        style="@style/Widget.AppCompat.Button.Colored"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/cv"
-        android:layout_alignParentTop="true"
-        android:layout_below="@+id/cv"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="140dp"
-        android:backgroundTint="@color/colorPrimary"
-        android:gravity="center"
-        android:text="Find New Quote"
-
-        android:textColor="#FFFFFF"
-        card_view:layout_constraintEnd_toEndOf="@+id/cv"
-        card_view:layout_constraintStart_toStartOf="@+id/cv"
-        card_view:layout_constraintTop_toBottomOf="@+id/cv" />
 
     <android.support.v7.widget.CardView
 
@@ -67,7 +47,7 @@
                 android:textStyle="italic" />
 
             <com.like.LikeButton
-                android:id="@+id/star_button"
+                android:id="@+id/like_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:icon_size="25dp"
@@ -78,6 +58,26 @@
         </LinearLayout>
 
     </android.support.v7.widget.CardView>
+
+    <Button
+        android:id="@+id/buttonFindQuote"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/cv"
+        android:layout_alignParentTop="true"
+        android:layout_below="@+id/cv"
+        android:layout_marginBottom="108dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:backgroundTint="@color/colorPrimary"
+
+        android:gravity="center"
+        android:text="Find New Quote"
+        android:textColor="#FFFFFF"
+        card_view:layout_constraintBottom_toBottomOf="parent"
+        card_view:layout_constraintEnd_toEndOf="@+id/cv"
+        card_view:layout_constraintStart_toStartOf="@+id/cv" />
 
 
 </android.support.constraint.ConstraintLayout>

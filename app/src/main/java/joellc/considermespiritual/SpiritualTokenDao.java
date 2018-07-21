@@ -18,6 +18,14 @@ import java.util.List;
 @Dao
 public interface SpiritualTokenDao {
 
+    // to update a favorite
+    @Query("UPDATE SpiritualToken SET favorite = :favorite WHERE ID = :id")
+    void updateFavorite(String id, boolean favorite);
+
+    // To get the favorites
+    @Query("SELECT * FROM SpiritualToken WHERE favorite = 1")
+    List<SpiritualToken> getFavoriteSpiritualTokens();
+
     @Query("SELECT DISTINCT author FROM SpiritualToken WHERE author IS NOT NULL AND scripture = 0")
     List<String> getUniqueAuthors();
 
