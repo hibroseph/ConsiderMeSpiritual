@@ -1,5 +1,7 @@
 package joellc.considermespiritual;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -17,6 +19,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -32,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    private SharedPreferences prefs;
 
     private int[] tabIcons = {
             R.drawable.chat_icon_24,
@@ -43,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         setSupportActionBar(findViewById(R.id.toolbar));
 
@@ -57,20 +63,54 @@ public class MainActivity extends AppCompatActivity {
         setupTabIcons();
         String TAG = "MainActivity";
 
+        // Get the shared preferences and make sure they can edit
 
-        // Let's clear the table so that we know we have a clean playing field
-        // DESTROY THE TABLE
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                Database.getDatabase(getApplicationContext()).spiritualTokenDao().nukeTable();
-//            }
-//        }).start();
+        // CURRENT DEBUGGING SECTION
+        FirebaseDatabase db = FirebaseDatabase.getInstance();
 
+        // Put this just to see where we can start
+        SharedPreferences.Editor editor= prefs.edit();
+        editor.putString("Last_Downloaded", "-LGOEw6mcW-R4N1wK5us").apply();
 
-        // Create a thread to download the quotes and scriptures from Firebase.
-        // Currently false to stop it from downloading the same data from Firebase
-        if(false) {
+        String startAtDownload = prefs.getString("Last_Downloaded", "");
+
+        if (startAtDownload != null) {
+            Query DownloadNewQuotesQuery = db.getReference("Quotes").orderByChild("id").startAt(startAtDownload);
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    DownloadNewQuotesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                            String lastDownloaded = null;
+                            for (DataSnapshot snappy : dataSnapshot.getChildren()) {
+
+                                Log.d(TAG, "An Object");
+                                SpiritualToken sp = snappy.getValue(SpiritualToken.class);
+                                Log.d(TAG, sp.getID());
+                                Log.d(TAG, sp.getQuote());
+                                lastDownloaded = sp.getID();
+                            }
+
+                            Log.d(TAG, "The last downloaded id was: " + lastDownloaded);
+
+                            // See if anything was downloaded
+                            if (lastDownloaded != null) {
+                                SharedPreferences.Editor editor = prefs.edit();
+                                editor.putString("Last_Downloaded", lastDownloaded).apply();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }).start();
+        } else {
             Thread downloadQuotesThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -78,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
 
                     // Get a reference to the Firebase where the quotes are stored.
                     DatabaseReference databaseRef = database.getReference("Quotes");
-
 
                     databaseRef.addValueEventListener(new ValueEventListener() {
                         @Override
@@ -89,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
                                     " children. Let's loop through them all to download them");
 
 
+                            String lastDownloaded = null;
                             for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
 
                                 Log.d(TAG, "A KEY: " + postSnapshot.getKey());
@@ -96,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
                                 // Get child at specific address
                                 SpiritualToken st = dataSnapshot.child(postSnapshot.getKey()).getValue(SpiritualToken.class);
 
+                                lastDownloaded = st.getID();
                                 // Check to see if you have a scripture
                                 if (st.getAuthor().matches(".*\\d.*")) {
                                     Log.d(TAG, "THIS CONTAINS A NUMBER. SCRIPTURE");
@@ -115,6 +156,10 @@ public class MainActivity extends AppCompatActivity {
 
                             // By time the code runs here, it should be done.
                             Log.d(TAG, "I think the firebase has finished loading data");
+
+                            // Store in the sharedPreferences the last downloaded item
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.putString("Last_Downloaded", lastDownloaded).apply();
 
                             // Let's tell the fragment that we are done downloading
 //                        SearchForQuoteFragment searchForQuoteFragment1 = (SearchForQuoteFragment) getSupportFragmentManager().findFragmentByTag("frag1");
@@ -166,6 +211,15 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
         }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int size = Database.getDatabase(getApplicationContext()).spiritualTokenDao().getSize();
+
+                Log.d(TAG, "The size of the table is: " + size);
+            }
+        }).start();
 
     }
 

@@ -30,6 +30,7 @@ public class SpiritualToken {
         tags = new ArrayList<>();
     }
 
+    @Ignore
     SpiritualToken(String ID, String author, String quote, boolean favorite, boolean scripture) {
         this.ID = ID;
         this.author = author;
