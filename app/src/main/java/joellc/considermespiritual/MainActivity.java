@@ -71,23 +71,12 @@ public class MainActivity extends AppCompatActivity {
 
         setupTabIcons();
 
-        // Get the shared preferences and make sure they can edit
-
         // CURRENT DEBUGGING SECTION
         firebaseDatabase = FirebaseDatabase.getInstance();
 
-        addToSharedPreferences("LAST_DOWNLOADED", "-LGOEw6muos-OonrZOnx");
+        addToSharedPreferences("LAST_DOWNLOADED", incrementPushIdBy1(""));
 
-        String startAtDownload = prefs.getString("LAST_DOWNLOADED", null);
-
-
-        findNumOfQuotesToDownload("");
-
-//        if (startAtDownload != null) {
-//            findNumOfQuotesToDownload(startAtDownload);
-//        } else {
-//            findNumOfQuotesToDownload("");
-//        }
+        findNumOfQuotesToDownload((prefs.getString("LAST_DOWNLOADED", null)));
 
         new Thread(new Runnable() {
             @Override
@@ -102,6 +91,15 @@ public class MainActivity extends AppCompatActivity {
     // Increments a push id that was saved from Firebase by 1
     public String incrementPushIdBy1(String Id) {
         // TODO: Handle incrementing where last letter is z
+
+        // Some prelimaray checks
+        if (Id == null) {
+            return null;
+        }
+
+        if (Id.equals("")) {
+            return "";
+        }
 
         // Get the position of the last char
         int posOfLastChar = (Id.length() - 1);
@@ -123,7 +121,14 @@ public class MainActivity extends AppCompatActivity {
     // stored that was downloaded
     private void findNumOfQuotesToDownload(String lastDownloadedString) {
 
+        // There is no previous download history
+        if (lastDownloadedString == null) {
+            lastDownloadedString = "";
+        }
+
         Query DownloadNewQuotesQuery = firebaseDatabase.getReference("Quotes").orderByChild("id").startAt(lastDownloadedString);
+
+        // TODO: check to see if there is internet
 
         // Create a new thread to access Firebase
         new Thread(new Runnable() {
@@ -134,6 +139,8 @@ public class MainActivity extends AppCompatActivity {
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                         long numOfQuotes = dataSnapshot.getChildrenCount();
+
+                        // TODO: Add handling to store how many quotes there are to download
 
                         Log.d(TAG, "You have " + numOfQuotes + " to download");
                     }
