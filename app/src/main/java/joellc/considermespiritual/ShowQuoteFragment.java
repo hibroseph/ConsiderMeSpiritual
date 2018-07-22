@@ -10,9 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.like.LikeButton;
 import com.like.OnLikeListener;
+
+import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -24,7 +27,6 @@ import static android.content.ContentValues.TAG;
 /**
  * Created by Joseph on 7/15/2018.
  */
-
 public class ShowQuoteFragment extends android.support.v4.app.Fragment {
 
     @BindView(R.id.quote) TextView quoteTextView;
@@ -116,26 +118,41 @@ public class ShowQuoteFragment extends android.support.v4.app.Fragment {
 
                         Log.d(TAG, "Database updated");
 
+                        spiritualToken.setFavorite(true);
+
+                        EventBus.getDefault().post(new AddToRecyclerViewEvent(spiritualToken));
+
                     }
                 }).start();
+
+                Toast.makeText(getActivity(), "Added To Favorites",
+                        Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void unLiked(LikeButton likeButton) {
                 Log.d(TAG, "Uh-oh, you unliked this quote");
-                Log.d(TAG, "Let's just make sure it was the correct quote");
-                Log.d(TAG, "Quote: " + spiritualToken.getQuote());
 
                 Log.d(TAG, "Going to update the database that you do not like this quote");
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        EventBus.getDefault().post(new RemoveFromRecyclerViewEvent(spiritualToken));
+
                         Database.getDatabase(getActivity().getApplicationContext())
                                 .spiritualTokenDao().updateFavorite(spiritualToken.getID(), false);
+
+
 
                         Log.d(TAG, "Database updated!");
                     }
                 }).start();
+
+                // Remove it from the recycler view
+
+
+                Toast.makeText(getActivity(), "Removed From Favorites",
+                        Toast.LENGTH_SHORT).show();
             }
         });
 

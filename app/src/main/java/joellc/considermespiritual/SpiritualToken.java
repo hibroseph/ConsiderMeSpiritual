@@ -30,6 +30,15 @@ public class SpiritualToken {
         tags = new ArrayList<>();
     }
 
+    SpiritualToken(String ID, String author, String quote, boolean favorite, boolean scripture) {
+        this.ID = ID;
+        this.author = author;
+        this.quote = quote;
+        this.favorite = favorite;
+        this.scripture = scripture;
+        tags = new ArrayList<>();
+    }
+
     // This will be the Firebase ID
     @PrimaryKey @NonNull
     private String ID;

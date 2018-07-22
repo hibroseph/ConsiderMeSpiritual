@@ -5,4 +5,15 @@ package joellc.considermespiritual;
  */
 
 public class AddToRecyclerViewEvent {
+
+    SpiritualToken sp;
+
+    AddToRecyclerViewEvent(SpiritualToken sp) {
+        this.sp = sp;
+    }
+
+    public SpiritualToken getSpiritualToken() {
+        return sp;
+    }
 }
+
