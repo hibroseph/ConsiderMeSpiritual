@@ -3,7 +3,6 @@ package joellc.considermespiritual;
 import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.EventLog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +15,8 @@ import com.like.OnLikeListener;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
+
+import joellc.considermespiritual.Events.UpdateDatabaseFavoriteQuoteEvent;
 
 public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TokenViewHolder> {
 

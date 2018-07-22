@@ -1,4 +1,6 @@
-package joellc.considermespiritual;
+package joellc.considermespiritual.Events;
+
+import joellc.considermespiritual.SpiritualToken;
 
 /**
  * This POJO is based off of the library EventBus to assist in handling events. This was specifically
@@ -7,7 +9,7 @@ package joellc.considermespiritual;
 public class UpdateDatabaseFavoriteQuoteEvent {
     private SpiritualToken sp;
 
-    UpdateDatabaseFavoriteQuoteEvent(SpiritualToken sp) {
+    public UpdateDatabaseFavoriteQuoteEvent(SpiritualToken sp) {
         this.sp = sp;
     }
 

@@ -18,6 +18,9 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import joellc.considermespiritual.Events.AddToRecyclerViewEvent;
+import joellc.considermespiritual.Events.RemoveFromRecyclerViewEvent;
+import joellc.considermespiritual.Events.UpdateDatabaseFavoriteQuoteEvent;
 
 /**
  * Created by Joseph on 7/20/2018.

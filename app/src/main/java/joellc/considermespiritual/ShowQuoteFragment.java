@@ -1,6 +1,5 @@
 package joellc.considermespiritual;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -21,6 +20,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnLongClick;
+import joellc.considermespiritual.Events.AddToRecyclerViewEvent;
+import joellc.considermespiritual.Events.RemoveFromRecyclerViewEvent;
 
 import static android.content.ContentValues.TAG;
 

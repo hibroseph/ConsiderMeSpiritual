@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Create a thread to download the quotes and scriptures from Firebase.
         // Currently false to stop it from downloading the same data from Firebase
-        if (false) {
+        if(false) {
             Thread downloadQuotesThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
