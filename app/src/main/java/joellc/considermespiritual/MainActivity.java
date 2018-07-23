@@ -1,5 +1,6 @@
 package joellc.considermespiritual;
 
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -9,24 +10,19 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.NestedScrollView;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
-
-
-import static java.lang.Boolean.TRUE;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -71,11 +67,17 @@ public class MainActivity extends AppCompatActivity {
 
         setupTabIcons();
 
-        // CURRENT DEBUGGING SECTION
+//        Log.d(TAG, "Nuking Table");
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                Database.getDatabase(getApplicationContext()).spiritualTokenDao().nukeTable();
+//            }
+//        }).start();
+
         firebaseDatabase = FirebaseDatabase.getInstance();
 
-        addToSharedPreferences("LAST_DOWNLOADED", incrementPushIdBy1(""));
-
+        // Get from the Shared preferences the last downloaded ID and find how many quotes there are to download
         findNumOfQuotesToDownload((prefs.getString("LAST_DOWNLOADED", null)));
 
         new Thread(new Runnable() {
@@ -90,6 +92,9 @@ public class MainActivity extends AppCompatActivity {
 
     // Increments a push id that was saved from Firebase by 1
     public String incrementPushIdBy1(String Id) {
+
+        Log.d(TAG, "The original Id is: " + Id);
+
         // TODO: Handle incrementing where last letter is z
 
         // Some prelimaray checks
@@ -113,45 +118,109 @@ public class MainActivity extends AppCompatActivity {
         // Increment the last char by 1 and add it to the char array
         charArray[posOfLastChar] = (char)(temp + 1);
 
+
+        Log.d(TAG, "The new incremented id is: " + new String(charArray));
+
         // Return a new string
         return new String(charArray);
+    }
+
+    private void downloadQuotes() {
+        String lastDownloadedQuote = incrementPushIdBy1(prefs.getString("LAST_DOWNLOADED", null));
+
+        Query query = firebaseDatabase.getReference("Quotes").orderByChild("id").startAt(lastDownloadedQuote).limitToFirst(5);
+
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.d(TAG, "We are going to download " + dataSnapshot.getChildrenCount() + " children");
+
+                String ID = null;
+
+                for (DataSnapshot snappy : dataSnapshot.getChildren()) {
+                    SpiritualToken st = snappy.getValue(SpiritualToken.class);
+
+                    Log.d(TAG, "Id: " + st.getID() );
+                    Log.d(TAG, "Quote: " + st.getQuote());
+                    Log.d(TAG, "Author: " + st.getAuthor());
+
+                    // Save the ID, in hopes to save the last one so we can store it in shared preferences
+                    ID = st.getID();
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Database.getDatabase(getApplicationContext()).spiritualTokenDao().addSpiritualToken(st);
+                        }
+                    }).start();
+                }
+
+                addToSharedPreferences("LAST_DOWNLOADED", ID);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void promptUserToDownloadQuotes(long quotesToDownload) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+        alertDialogBuilder.setPositiveButton("Download 5", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Log.d(TAG, "You clicked the download button");
+
+                downloadQuotes();
+            }
+        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Log.d(TAG, "You pressed cancel");
+            }
+        }).setMessage("You have " + quotesToDownload + " new quotes to download").create().show();
+
     }
 
     // This function returns the number of quotes that exist to download according to the last id
     // stored that was downloaded
     private void findNumOfQuotesToDownload(String lastDownloadedString) {
 
+        lastDownloadedString = incrementPushIdBy1(lastDownloadedString);
+
         // There is no previous download history
         if (lastDownloadedString == null) {
             lastDownloadedString = "";
         }
 
-        Query DownloadNewQuotesQuery = firebaseDatabase.getReference("Quotes").orderByChild("id").startAt(lastDownloadedString);
+        //Query DownloadNewQuotesQuery = firebaseDatabase.getReference("Quotes").orderByChild("id").startAt(lastDownloadedString);
 
-        // TODO: check to see if there is internet
+        Log.d(TAG, "lastDownloadedString: " + lastDownloadedString);
 
-        // Create a new thread to access Firebase
-        new Thread(new Runnable() {
+        firebaseDatabase = FirebaseDatabase.getInstance();
+
+        Query ref = firebaseDatabase.getReference("Quotes").orderByChild("id").startAt(lastDownloadedString);
+
+        ref.addValueEventListener(new ValueEventListener() {
             @Override
-            public void run() {
-                DownloadNewQuotesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                        long numOfQuotes = dataSnapshot.getChildrenCount();
+                Log.d(TAG, "You have " + dataSnapshot.getChildrenCount() + " children to download");
 
-                        // TODO: Add handling to store how many quotes there are to download
-
-                        Log.d(TAG, "You have " + numOfQuotes + " to download");
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        //TODO: Handle error
-                    }
-                });
+                // There are more than 15 quotes to download, prompt the user to download the new ones
+                if (dataSnapshot.getChildrenCount() > 15) {
+                    promptUserToDownloadQuotes(dataSnapshot.getChildrenCount());
+                }
             }
-        }).start();
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
 
@@ -166,6 +235,14 @@ public class MainActivity extends AppCompatActivity {
 
         editor.putString(key, value).apply();
 
+    }
+
+    private void removeFromSharedPreferences(String key) {
+        SharedPreferences.Editor editor = prefs.edit();
+
+        editor.remove(key).apply();
+
+        Log.d(TAG, key + " succesfully removed from SharedPreferences");
     }
 
     // Set up tab icons lol like the name
