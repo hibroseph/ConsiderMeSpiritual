@@ -15,6 +15,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.widget.NumberPicker;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -23,6 +25,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+
+//TODO: Adding settings to give options like changing color and clearing the database
+//TODO: Add a way to delete quotes from your database
 
 public class MainActivity extends AppCompatActivity {
 
@@ -125,10 +130,12 @@ public class MainActivity extends AppCompatActivity {
         return new String(charArray);
     }
 
+    // Downloads the quotes from the last downloaded ID loaded in the shared preferences. Right now
+    // this number is fixed at 5
     private void downloadQuotes() {
         String lastDownloadedQuote = incrementPushIdBy1(prefs.getString("LAST_DOWNLOADED", null));
 
-        Query query = firebaseDatabase.getReference("Quotes").orderByChild("id").startAt(lastDownloadedQuote).limitToFirst(5);
+        Query query = firebaseDatabase.getReference("Quotes").orderByChild("id").startAt(lastDownloadedQuote);
 
         query.addValueEventListener(new ValueEventListener() {
             @Override
@@ -160,11 +167,12 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                Log.e(TAG, "Oppa, there was an error" + databaseError.getDetails());
             }
         });
     }
 
+    // This function is used to prompt the user to download the new quotes that have been added
     private void promptUserToDownloadQuotes(long quotesToDownload) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
@@ -181,7 +189,6 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "You pressed cancel");
             }
         }).setMessage("You have " + quotesToDownload + " new quotes to download").create().show();
-
     }
 
     // This function returns the number of quotes that exist to download according to the last id
