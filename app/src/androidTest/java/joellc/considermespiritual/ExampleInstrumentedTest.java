@@ -23,4 +23,9 @@ public class ExampleInstrumentedTest {
 
         assertEquals("joellc.considermespiritual", appContext.getPackageName());
     }
+
+    @Test
+    public void testIncrement() throws Exception {
+
+    }
 }

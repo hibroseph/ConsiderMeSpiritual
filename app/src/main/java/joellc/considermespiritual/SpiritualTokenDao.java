@@ -18,6 +18,10 @@ import java.util.List;
 @Dao
 public interface SpiritualTokenDao {
 
+    // Get how many rows exist to help debug issue with Firebase
+    @Query("SELECT COUNT(*) FROM SpiritualToken")
+    int getSize();
+
     // to update a favorite
     @Query("UPDATE SpiritualToken SET favorite = :favorite WHERE ID = :id")
     void updateFavorite(String id, boolean favorite);

@@ -94,68 +94,6 @@ public class ShowQuoteFragment extends android.support.v4.app.Fragment {
      */
     public void showNewQuote(SpiritualToken spiritualToken) {
 
-        // Set the liked button to what we have saved
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                likeButton.setLiked(spiritualToken.isFavorite());
-            }
-        });
-
-
-        likeButton.setOnLikeListener(new OnLikeListener() {
-            @Override
-            public void liked(LikeButton likeButton) {
-                Log.d(TAG, "You liked this quote");
-                Log.d(TAG, "Let's just make sure it was the correct quote");
-                Log.d(TAG, "Quote: " + spiritualToken.getQuote());
-
-                // Update the database that you like it
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Database.getDatabase(getActivity().getApplicationContext())
-                                .spiritualTokenDao().updateFavorite(spiritualToken.getID(), true);
-
-                        Log.d(TAG, "Database updated");
-
-                        spiritualToken.setFavorite(true);
-
-                        EventBus.getDefault().post(new AddToRecyclerViewEvent(spiritualToken));
-
-                    }
-                }).start();
-
-                Toast.makeText(getActivity(), "Added To Favorites",
-                        Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void unLiked(LikeButton likeButton) {
-                Log.d(TAG, "Uh-oh, you unliked this quote");
-
-                Log.d(TAG, "Going to update the database that you do not like this quote");
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        EventBus.getDefault().post(new RemoveFromRecyclerViewEvent(spiritualToken));
-
-                        Database.getDatabase(getActivity().getApplicationContext())
-                                .spiritualTokenDao().updateFavorite(spiritualToken.getID(), false);
-
-
-
-                        Log.d(TAG, "Database updated!");
-                    }
-                }).start();
-
-                // Remove it from the recycler view
-
-
-                Toast.makeText(getActivity(), "Removed From Favorites",
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
 
         if(spiritualToken != null) {
             String quote = spiritualToken.getQuote();
@@ -184,6 +122,75 @@ public class ShowQuoteFragment extends android.support.v4.app.Fragment {
                 }
             });
         }
+
+        if (spiritualToken != null) {
+            // Set the liked button to what we have saved
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    likeButton.setLiked(spiritualToken.isFavorite());
+                }
+            });
+        }
+
+        likeButton.setOnLikeListener(new OnLikeListener() {
+            @Override
+            public void liked(LikeButton likeButton) {
+
+                if (spiritualToken != null) {
+                    Log.d(TAG, "You liked this quote");
+                    Log.d(TAG, "Let's just make sure it was the correct quote");
+                    Log.d(TAG, "Quote: " + spiritualToken.getQuote());
+
+                    // Update the database that you like it
+                    new Thread(new Runnable() {
+                        @Override
+
+                        public void run() {
+                            Database.getDatabase(getActivity().getApplicationContext())
+                                    .spiritualTokenDao().updateFavorite(spiritualToken.getID(), true);
+
+                            Log.d(TAG, "Database updated");
+
+                            spiritualToken.setFavorite(true);
+
+                            EventBus.getDefault().post(new AddToRecyclerViewEvent(spiritualToken));
+
+                        }
+                    }).start();
+
+                }
+                Toast.makeText(getActivity(), "Added To Favorites",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void unLiked(LikeButton likeButton) {
+                Log.d(TAG, "Uh-oh, you unliked this quote");
+
+                if (spiritualToken != null) {
+                    Log.d(TAG, "Going to update the database that you do not like this quote");
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            EventBus.getDefault().post(new RemoveFromRecyclerViewEvent(spiritualToken));
+
+                            Database.getDatabase(getActivity().getApplicationContext())
+                                    .spiritualTokenDao().updateFavorite(spiritualToken.getID(), false);
+
+
+                            Log.d(TAG, "Database updated!");
+                        }
+                    }).start();
+                }
+                // Remove it from the recycler view
+
+
+                Toast.makeText(getActivity(), "Removed From Favorites",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
     /**
