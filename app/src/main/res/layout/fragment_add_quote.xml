@@ -2,17 +2,16 @@
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/textView_add_quote_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="24dp"
-        android:text="Add a Quote"
+        android:text="@string/add_quote_title"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.053"
@@ -20,31 +19,31 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/editTextAuthorInput"
+        android:id="@+id/editText_add_quote_author_input"
         android:layout_width="323dp"
         android:layout_height="42dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:ems="10"
-        android:hint="Author"
+        android:hint="@string/add_quote_author"
         android:inputType="textCapWords"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView4" />
+        app:layout_constraintTop_toBottomOf="@+id/textView_add_quote_title" />
 
     <EditText
-        android:id="@+id/editTextQuoteInput"
+        android:id="@+id/editText_add_quote_quote_input"
         android:layout_width="322dp"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Quote"
+        android:hint="@string/add_quote_quote"
         android:inputType="textCapSentences|textMultiLine"
         android:minHeight="48dp"
         android:scrollHorizontally="false"
 
-        app:layout_constraintStart_toStartOf="@+id/editTextAuthorInput"
-        app:layout_constraintTop_toBottomOf="@+id/editTextAuthorInput" />
+        app:layout_constraintStart_toStartOf="@+id/editText_add_quote_author_input"
+        app:layout_constraintTop_toBottomOf="@+id/editText_add_quote_author_input" />
 
     <Button
         android:id="@+id/buttonAddQuote"
@@ -55,41 +54,41 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="84dp"
         android:backgroundTint="@color/colorPrimary"
-        android:text="Add"
+        android:text="@string/add_quote_button_add"
         android:textColor="#FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextQuoteInput" />
+        app:layout_constraintTop_toBottomOf="@+id/editText_add_quote_quote_input" />
 
     <CheckBox
-        android:id="@+id/checkboxScripture"
+        android:id="@+id/checkbox_add_quote_scripture"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="28dp"
         android:layout_marginTop="8dp"
-        android:text="Scripture"
+        android:text="@string/add_quote_checkbox_scripture"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextQuoteInput" />
+        app:layout_constraintTop_toBottomOf="@+id/editText_add_quote_quote_input" />
 
     <CheckBox
-        android:id="@+id/checkBoxUpload"
+        android:id="@+id/checkBox_add_quote_upload_online"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="28dp"
         android:layout_marginTop="8dp"
-        android:text="Upload Online"
+        android:text="@string/add_quote_checkbox_upload_online"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextQuoteInput" />
+        app:layout_constraintTop_toBottomOf="@+id/editText_add_quote_quote_input" />
 
     <CheckBox
-        android:id="@+id/checkBoxFavorite"
+        android:id="@+id/checkBox_add_quote_favorite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="Favorite"
-        app:layout_constraintEnd_toStartOf="@+id/checkBoxUpload"
-        app:layout_constraintStart_toEndOf="@+id/checkboxScripture"
-        app:layout_constraintTop_toBottomOf="@+id/editTextQuoteInput" />
+        android:text="@string/add_quote_checkbox_favorite"
+        app:layout_constraintEnd_toStartOf="@+id/checkBox_add_quote_upload_online"
+        app:layout_constraintStart_toEndOf="@+id/checkbox_add_quote_scripture"
+        app:layout_constraintTop_toBottomOf="@+id/editText_add_quote_quote_input" />
 </android.support.constraint.ConstraintLayout>

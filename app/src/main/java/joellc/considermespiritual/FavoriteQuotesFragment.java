@@ -1,6 +1,7 @@
 package joellc.considermespiritual;
 
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,6 +21,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import joellc.considermespiritual.Events.AddToRecyclerViewEvent;
 import joellc.considermespiritual.Events.RemoveFromRecyclerViewEvent;
+import joellc.considermespiritual.Events.ShowNewQuoteEvent;
 import joellc.considermespiritual.Events.UpdateDatabaseFavoriteQuoteEvent;
 
 /**
@@ -97,6 +99,7 @@ public class FavoriteQuotesFragment extends Fragment {
         String TAG = "onEvent:Add";
 
         Log.d(TAG, "Inserting spiritualToken into list");
+
         rvAdapter.insert(event.getSpiritualToken());
 
         // Notify that the list has changed

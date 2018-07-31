@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.like.LikeButton;
@@ -17,6 +18,7 @@ import org.greenrobot.eventbus.EventBus;
 import java.util.List;
 
 import joellc.considermespiritual.Events.UpdateDatabaseFavoriteQuoteEvent;
+import joellc.considermespiritual.Listeners.OnDeleteClickListener;
 
 public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TokenViewHolder> {
 
@@ -34,6 +36,7 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TokenViewHolder> {
         TextView quote;
         TextView author;
         LikeButton heart;
+        ImageView delete;
 
         public TokenViewHolder(View itemView) {
             super(itemView);
@@ -41,6 +44,7 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TokenViewHolder> {
             quote = itemView.findViewById(R.id.quote);
             author = itemView.findViewById(R.id.author);
             heart = itemView.findViewById(R.id.heart_button);
+            delete = itemView.findViewById(R.id.delete_button);
         }
 
     }
@@ -85,6 +89,11 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TokenViewHolder> {
         holder.author.setText(spiritualTokens.get(position).getAuthor());
         holder.quote.setText(spiritualTokens.get(position).getQuote());
         holder.heart.setLiked(spiritualTokens.get(position).isFavorite());
+
+
+        holder.delete.setTag(spiritualTokens.get(position).getID());
+        
+        holder.delete.setOnClickListener(new OnDeleteClickListener());
 
         holder.heart.setOnLikeListener(new OnLikeListener() {
             @Override

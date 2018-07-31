@@ -13,7 +13,7 @@ import static java.sql.Types.NULL;
  * Representing the database that will store all of the key and values. Based on the singleton
  * pattern so only one database is instantiated.
  */
-class Database {
+public class Database {
     private static AppDatabase db;
     private static Context context;
 

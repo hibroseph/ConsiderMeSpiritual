@@ -1,7 +1,9 @@
 package joellc.considermespiritual;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
@@ -9,13 +11,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.widget.NumberPicker;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -30,10 +31,6 @@ import java.util.List;
 //TODO: Add a way to delete quotes from your database
 
 public class MainActivity extends AppCompatActivity {
-
-    NestedScrollView nsv;
-
-    private Toolbar toolbar;
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private SharedPreferences prefs;
@@ -43,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
 
     private FirebaseDatabase firebaseDatabase;
 
+
+    // The icons for the tabs
     private int[] tabIcons = {
             R.drawable.chat_icon_24,
             R.drawable.thumb_up_24,
@@ -72,19 +71,12 @@ public class MainActivity extends AppCompatActivity {
 
         setupTabIcons();
 
-//        Log.d(TAG, "Nuking Table");
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                Database.getDatabase(getApplicationContext()).spiritualTokenDao().nukeTable();
-//            }
-//        }).start();
-
         firebaseDatabase = FirebaseDatabase.getInstance();
 
         // Get from the Shared preferences the last downloaded ID and find how many quotes there are to download
         findNumOfQuotesToDownload((prefs.getString("LAST_DOWNLOADED", null)));
 
+        // Displays the size of the table
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -95,18 +87,48 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
-    // Increments a push id that was saved from Firebase by 1
-    public String incrementPushIdBy1(String Id) {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+
+        inflater.inflate(R.menu.main_menu, menu);
+
+        return true;
+    }
+
+    // This assists us in creating the options menu
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.settings:
+                Log.d(TAG, "You pressed the settings in the menu");
+                startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+                break;
+        }
+        return true;
+    }
+
+    /**
+     * Increments the ID that is passed to the function by 1. This is so we only download new items.
+     * This is because the ID that is saved in the shared preferences is already in the phone data-
+     * base
+     * @param Id The string ID that you want to increase by 1
+     * @return The incremented ID
+     */
+    public String incrementPushId(String Id) {
 
         Log.d(TAG, "The original Id is: " + Id);
 
         // TODO: Handle incrementing where last letter is z
 
-        // Some prelimaray checks
+        // Some preliminary checks
+        // If it was null, return null.
         if (Id == null) {
             return null;
         }
 
+        // If there was nothing, don't increase anything.
         if (Id.equals("")) {
             return "";
         }
@@ -130,11 +152,14 @@ public class MainActivity extends AppCompatActivity {
         return new String(charArray);
     }
 
-    // Downloads the quotes from the last downloaded ID loaded in the shared preferences. Right now
-    // this number is fixed at 5
+    /**
+     * Downloads quotes from the database taking the ID of the last downloaded quote from shared
+     * preferences
+     */
     private void downloadQuotes() {
-        String lastDownloadedQuote = incrementPushIdBy1(prefs.getString("LAST_DOWNLOADED", null));
+        String lastDownloadedQuote = incrementPushId(prefs.getString("LAST_DOWNLOADED", null));
 
+        // TODO: Test to download quotes with .startAt(null);
         Query query = firebaseDatabase.getReference("Quotes").orderByChild("id").startAt(lastDownloadedQuote);
 
         query.addValueEventListener(new ValueEventListener() {
@@ -172,15 +197,17 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // This function is used to prompt the user to download the new quotes that have been added
-    private void promptUserToDownloadQuotes(long quotesToDownload) {
+    /**
+     * Prompts the user to download the quotes
+     * @param numQuotesToDownload The number of quotes to download
+     */
+    private void promptUserToDownloadQuotes(long numQuotesToDownload) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
-        alertDialogBuilder.setPositiveButton("Download 5", new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setPositiveButton("Download Quotes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 Log.d(TAG, "You clicked the download button");
-
                 downloadQuotes();
             }
         }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -188,29 +215,31 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialogInterface, int i) {
                 Log.d(TAG, "You pressed cancel");
             }
-        }).setMessage("You have " + quotesToDownload + " new quotes to download").create().show();
+        }).setMessage("You have " + numQuotesToDownload + " new quotes to download").create().show();
     }
 
-    // This function returns the number of quotes that exist to download according to the last id
-    // stored that was downloaded
+    /**
+     * This function returns the number of quotes that exist to download according to the last id
+     * stored that was downloaded in the shared preferences
+     * @param lastDownloadedString The string of the last downloaded ID
+     */
     private void findNumOfQuotesToDownload(String lastDownloadedString) {
 
-        lastDownloadedString = incrementPushIdBy1(lastDownloadedString);
+        // Increase the ID by 1 so it will count only new items in Firebase
+        lastDownloadedString = incrementPushId(lastDownloadedString);
 
         // There is no previous download history
         if (lastDownloadedString == null) {
             lastDownloadedString = "";
         }
 
-        //Query DownloadNewQuotesQuery = firebaseDatabase.getReference("Quotes").orderByChild("id").startAt(lastDownloadedString);
-
         Log.d(TAG, "lastDownloadedString: " + lastDownloadedString);
 
-        firebaseDatabase = FirebaseDatabase.getInstance();
+        //firebaseDatabase = FirebaseDatabase.getInstance();
 
-        Query ref = firebaseDatabase.getReference("Quotes").orderByChild("id").startAt(lastDownloadedString);
+        Query quoteReference = firebaseDatabase.getReference("Quotes").orderByChild("id").startAt(lastDownloadedString);
 
-        ref.addValueEventListener(new ValueEventListener() {
+        quoteReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
@@ -224,12 +253,11 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                Log.e(TAG, "There was a database Error" + databaseError.getDetails());
             }
         });
 
     }
-
 
     /**
      * Adds the parameters passed to shared preferences. This was made in attempt to size down and
@@ -244,12 +272,16 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Removes a value from the shared preferences with the specified key
+     * @param key
+     */
     private void removeFromSharedPreferences(String key) {
         SharedPreferences.Editor editor = prefs.edit();
 
         editor.remove(key).apply();
 
-        Log.d(TAG, key + " succesfully removed from SharedPreferences");
+        Log.d(TAG, key + " successfully removed from SharedPreferences");
     }
 
     // Set up tab icons lol like the name
@@ -295,7 +327,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public CharSequence getPageTitle(int position) {
             return null;
-            //            return mFragmentTitleList.get(position);
+//            return mFragmentTitleList.get(position);
         }
     }
 }

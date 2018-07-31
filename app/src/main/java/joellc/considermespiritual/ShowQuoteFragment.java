@@ -7,7 +7,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,6 +17,8 @@ import com.like.LikeButton;
 import com.like.OnLikeListener;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -22,6 +26,9 @@ import butterknife.OnClick;
 import butterknife.OnLongClick;
 import joellc.considermespiritual.Events.AddToRecyclerViewEvent;
 import joellc.considermespiritual.Events.RemoveFromRecyclerViewEvent;
+import joellc.considermespiritual.Events.ShowNewQuoteEvent;
+import joellc.considermespiritual.Listeners.OnDeleteClickListener;
+import joellc.considermespiritual.Listeners.OnHeartClickListener;
 
 import static android.content.ContentValues.TAG;
 
@@ -30,10 +37,27 @@ import static android.content.ContentValues.TAG;
  */
 public class ShowQuoteFragment extends android.support.v4.app.Fragment {
 
-    @BindView(R.id.quote) TextView quoteTextView;
-    @BindView(R.id.author) TextView authorTextView;
+    // This is to hold the cardView that will be inflated
+    public class DynamicCardView {
+        @BindView(R.id.quote) TextView quoteTextView;
+        @BindView(R.id.author) TextView authorTextView;
+        @BindView(R.id.heart_button) LikeButton likeButton;
+        @BindView(R.id.delete_button) ImageView deleteButton;
+
+        public DynamicCardView(View view) {
+            ButterKnife.bind(this, view);
+        }
+
+        public View getview() {
+            return getview();
+        }
+
+    }
+
     @BindView(R.id.buttonFindQuote) Button findQuote;
-    @BindView(R.id.like_button) LikeButton likeButton;
+    @BindView(R.id.viewStubQuoteCard) ViewStub cardView;
+
+    DynamicCardView dynamicCardView;
 
     @Override
     public void onAttach(Context context) {
@@ -49,6 +73,8 @@ public class ShowQuoteFragment extends android.support.v4.app.Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        EventBus.getDefault().register(this);
     }
 
     @Nullable
@@ -59,41 +85,49 @@ public class ShowQuoteFragment extends android.support.v4.app.Fragment {
 
         ButterKnife.bind(this, view);
 
+        View stubView = cardView.inflate();
+
+
+        dynamicCardView = new DynamicCardView(stubView);
 
         Thread t = new Thread() {
             @Override
             public void run() {
-                Log.d(TAG, "We are going to start to access the database");
-
-                String quote;
-                String author;
-
-                SpiritualToken result;
-
-                Log.d(TAG, "Getting a random quote!");
-
-                result = Database.getDatabase(getActivity().getApplicationContext())
-                        .spiritualTokenDao().getSpiritualToken();
-
-                Log.d(TAG, "Is the result equal to null? " + result);
-
-                showNewQuote(result);
-
+                SpiritualToken sp = getNewQuote();
+                showNewQuote(sp);
             }
         };
 
         t.start();
 
-
         return view;
     }
+
+    public SpiritualToken getNewQuote() {
+
+        Log.d(TAG, "We are going to start to access the database");
+
+        String quote;
+        String author;
+
+        SpiritualToken result;
+
+        Log.d(TAG, "Getting a random quote!");
+
+        result = Database.getDatabase(getActivity().getApplicationContext())
+                .spiritualTokenDao().getSpiritualToken();
+         Log.d(TAG, "Is the result equal to null? " + result);
+
+         return result;
+    }
+
+
 
     /**
      * Method to replace the quote that is show on the screen
      * @param spiritualToken The token that you would like to display
      */
     public void showNewQuote(SpiritualToken spiritualToken) {
-
 
         if(spiritualToken != null) {
             String quote = spiritualToken.getQuote();
@@ -102,8 +136,10 @@ public class ShowQuoteFragment extends android.support.v4.app.Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    quoteTextView.setText(quote);
-                    authorTextView.setText(author);
+
+
+                    dynamicCardView.quoteTextView.setText(quote);
+                    dynamicCardView.authorTextView.setText(author);
                 }
             });
         } else {
@@ -117,8 +153,8 @@ public class ShowQuoteFragment extends android.support.v4.app.Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    quoteTextView.setText("Practice doesn't make perfect, Christ makes perfect");
-                    authorTextView.setText("Brad Wilcox");
+                    dynamicCardView.quoteTextView.setText("Practice doesn't make perfect, Christ makes perfect");
+                    dynamicCardView.authorTextView.setText("Brad Wilcox");
                 }
             });
         }
@@ -128,68 +164,20 @@ public class ShowQuoteFragment extends android.support.v4.app.Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    likeButton.setLiked(spiritualToken.isFavorite());
+                    dynamicCardView.likeButton.setLiked(spiritualToken.isFavorite());
                 }
             });
         }
 
-        likeButton.setOnLikeListener(new OnLikeListener() {
-            @Override
-            public void liked(LikeButton likeButton) {
+        // Set the Tag for the listeners
+        dynamicCardView.likeButton.setTag(spiritualToken.getID());
+        dynamicCardView.deleteButton.setTag(spiritualToken.getID());
 
-                if (spiritualToken != null) {
-                    Log.d(TAG, "You liked this quote");
-                    Log.d(TAG, "Let's just make sure it was the correct quote");
-                    Log.d(TAG, "Quote: " + spiritualToken.getQuote());
+        // Set up the like button
+        dynamicCardView.likeButton.setOnLikeListener(new OnHeartClickListener());
 
-                    // Update the database that you like it
-                    new Thread(new Runnable() {
-                        @Override
-
-                        public void run() {
-                            Database.getDatabase(getActivity().getApplicationContext())
-                                    .spiritualTokenDao().updateFavorite(spiritualToken.getID(), true);
-
-                            Log.d(TAG, "Database updated");
-
-                            spiritualToken.setFavorite(true);
-
-                            EventBus.getDefault().post(new AddToRecyclerViewEvent(spiritualToken));
-
-                        }
-                    }).start();
-
-                }
-                Toast.makeText(getActivity(), "Added To Favorites",
-                        Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void unLiked(LikeButton likeButton) {
-                Log.d(TAG, "Uh-oh, you unliked this quote");
-
-                if (spiritualToken != null) {
-                    Log.d(TAG, "Going to update the database that you do not like this quote");
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            EventBus.getDefault().post(new RemoveFromRecyclerViewEvent(spiritualToken));
-
-                            Database.getDatabase(getActivity().getApplicationContext())
-                                    .spiritualTokenDao().updateFavorite(spiritualToken.getID(), false);
-
-
-                            Log.d(TAG, "Database updated!");
-                        }
-                    }).start();
-                }
-                // Remove it from the recycler view
-
-
-                Toast.makeText(getActivity(), "Removed From Favorites",
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
+        // Set up the delete button
+        dynamicCardView.deleteButton.setOnClickListener(new OnDeleteClickListener());
 
     }
 
@@ -222,4 +210,12 @@ public class ShowQuoteFragment extends android.support.v4.app.Fragment {
         return true;
     }
 
+    @Subscribe()
+    public void onEvent(ShowNewQuoteEvent event) {
+
+        Log.d(TAG, "This is getting called");
+
+        SpiritualToken sp = getNewQuote();
+        showNewQuote(sp);
+    }
 }

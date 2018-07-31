@@ -28,11 +28,11 @@ import joellc.considermespiritual.Events.AddToRecyclerViewEvent;
 
 public class AddQuoteFragment extends Fragment {
 
-    @BindView(R.id.editTextAuthorInput) EditText editTextAuthor;
-    @BindView(R.id.editTextQuoteInput) EditText editTextQuote;
-    @BindView(R.id.checkBoxFavorite) CheckBox checkBoxFavorite;
-    @BindView(R.id.checkboxScripture) CheckBox checkBoxScripture;
-    @BindView(R.id.checkBoxUpload) CheckBox checkBoxUpload;
+    @BindView(R.id.editText_add_quote_author_input) EditText editTextAuthor;
+    @BindView(R.id.editText_add_quote_quote_input) EditText editTextQuote;
+    @BindView(R.id.checkBox_add_quote_favorite) CheckBox checkBoxFavorite;
+    @BindView(R.id.checkbox_add_quote_scripture) CheckBox checkBoxScripture;
+    @BindView(R.id.checkBox_add_quote_upload_online) CheckBox checkBoxUpload;
 
     public AddQuoteFragment() {
 

@@ -1,18 +1,16 @@
 <resources>
-
     <string name="app_name">Consider Me Spiritual</string>
-    <string name="welcomeScreenDescription">In need of a quick spiritual fix? You\'ve come to the
-    right place. Press Spiritualize me to find the correct quote in a jiffy</string>
-    <string name="quoteButton">Find Quote</string>
-    <string name="lol">You\'re spiritual!</string>
-    <string name="submitButton">Submit</string>
-    <string name="ratingbutton">Rate</string>
-    <string name="chooseTopic">Choose a Topic</string>
-    <string name="chooseAuthor">Choose an Author</string>
-    <string name="scripture">Scripture</string>
-    <string name="talk">Talk</string>
-    <string name="generalAuthority">General Authority</string>
-    <string name="findQuoteTitle">Find a Spiritual Thought:</string>
-    <string name="actionGetQuote">Find Quote</string>
+    
+    <!-- Add a quote fragment-->
+    <string name="add_quote_title">Add a quote</string>
+    <string name="add_quote_author">Author</string>
+    <string name="add_quote_quote">Quote</string>
+    <string name="add_quote_checkbox_scripture">Scripture</string>
+    <string name="add_quote_checkbox_favorite">Favorite</string>
+    <string name="add_quote_checkbox_upload_online">Upload Online</string>
+    <string name="add_quote_button_add">Add Quote</string>
 
+
+    <!-- Show a quote fragment -->
+    <string name="show_quote_button_find">Find New Quote</string>
 </resources>

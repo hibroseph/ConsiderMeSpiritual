@@ -18,7 +18,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="56dp"
-            android:text="@string/quoteButton"
+            android:text="Find Quote"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/checkBox" />
@@ -44,7 +44,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="128dp"
             android:checked="true"
-            android:text="@string/scripture"
+            android:text="Scripture"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.171"
             app:layout_constraintStart_toStartOf="@+id/spinnerTopic"
@@ -58,7 +58,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:checked="true"
-            android:text="@string/talk"
+            android:text="Talk"
             app:layout_constraintBottom_toBottomOf="@+id/checkBox"
             app:layout_constraintEnd_toEndOf="@+id/spinnerTopic"
             app:layout_constraintStart_toEndOf="@+id/checkBox"
@@ -71,7 +71,7 @@
             android:layout_height="17dp"
             android:layout_marginStart="12dp"
             android:layout_marginTop="24dp"
-            android:text="@string/chooseTopic"
+            android:text="Choose Topic"
             app:layout_constraintStart_toStartOf="@+id/textView3"
             app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
@@ -93,7 +93,7 @@
             android:layout_width="wrap_content"
             android:layout_height="17dp"
             android:layout_marginTop="20dp"
-            android:text="@string/chooseAuthor"
+            android:text="Choose Author"
             app:layout_constraintStart_toStartOf="@+id/textView"
             app:layout_constraintTop_toBottomOf="@+id/spinnerTopic" />
 
@@ -103,7 +103,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-            android:text="@string/findQuoteTitle"
+            android:text="Find Quote Title"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/ActivityFindQuoteToolbar" />

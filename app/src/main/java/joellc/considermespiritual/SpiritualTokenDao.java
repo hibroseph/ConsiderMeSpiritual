@@ -43,6 +43,9 @@ public interface SpiritualTokenDao {
     @Query("SELECT * FROM SpiritualToken ORDER BY RANDOM() LIMIT 1")
     SpiritualToken getSpiritualToken();
 
+    @Query("SELECT * FROM SpiritualToken WHERE ID = :id")
+    SpiritualToken getSpiritualToken(String id);
+
     // Selects a token with a specific author and topic
     @Query("SELECT * FROM SpiritualToken WHERE author = :requestedAuthor LIMIT 1")
     SpiritualToken getSpecificSpiritualToken(String requestedAuthor);
@@ -67,7 +70,6 @@ public interface SpiritualTokenDao {
     @Insert
     void addSpiritualToken(SpiritualToken st);
 
-    // You can delete by author
     @Delete
-    void deleteSpiritualTokenByAuthor(SpiritualToken st);
+    void deleteSpiritualToken(SpiritualToken st);
 }
