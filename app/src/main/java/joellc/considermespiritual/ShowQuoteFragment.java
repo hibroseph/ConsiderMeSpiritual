@@ -167,11 +167,13 @@ public class ShowQuoteFragment extends android.support.v4.app.Fragment {
                     dynamicCardView.likeButton.setLiked(spiritualToken.isFavorite());
                 }
             });
+
+            // Set the Tag for the listeners
+            dynamicCardView.likeButton.setTag(spiritualToken.getID());
+            dynamicCardView.deleteButton.setTag(spiritualToken.getID());
+
         }
 
-        // Set the Tag for the listeners
-        dynamicCardView.likeButton.setTag(spiritualToken.getID());
-        dynamicCardView.deleteButton.setTag(spiritualToken.getID());
 
         // Set up the like button
         dynamicCardView.likeButton.setOnLikeListener(new OnHeartClickListener());

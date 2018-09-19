@@ -2,25 +2,36 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
 
+
+    <PreferenceCategory android:title="@string/setting_title_quotes">
+
+        <Preference
+            android:title="@string/setting_title_new_quotes"
+            android:key="@string/setting_key_new_quotes"
+            android:summary="@string/setting_summary_new_quotes"/>
+
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="General">
 
         <EditTextPreference
-            android:defaultValue="Default value"
-            android:key="edit_text_preference_1"
+            android:defaultValue="@string/setting_defaultValue_feedback"
+            android:key="@string/setting_key_feedback"
             android:selectAllOnFocus="true"
             android:singleLine="false"
-            android:title="Send Feedback" />
+            android:title="@string/setting_title_feedback" />
 
         <Preference
             android:selectable="false"
             android:enabled="true"
-            android:title="Version: 1"/>
+            android:title="@string/setting_title_version"/>
 
         <Preference
             android:selectable="false"
             android:enabled="true"
-            android:title="Created By Joseph"/>
+            android:title="@string/setting_title_created_by"/>
 
 
     </PreferenceCategory>
+
 </PreferenceScreen>

@@ -19,6 +19,8 @@ public class SettingsActivity extends PreferenceActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+
+
         addPreferencesFromResource(R.xml.preferences);
     }
 
