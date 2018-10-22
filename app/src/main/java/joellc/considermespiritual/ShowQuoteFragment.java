@@ -1,6 +1,8 @@
 package joellc.considermespiritual;
 
+import android.app.Activity;
 import android.content.Context;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -8,17 +10,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.like.LikeButton;
 import com.like.OnLikeListener;
+import com.robertlevonyan.views.chip.Chip;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -31,6 +40,7 @@ import joellc.considermespiritual.Listeners.OnDeleteClickListener;
 import joellc.considermespiritual.Listeners.OnHeartClickListener;
 
 import static android.content.ContentValues.TAG;
+import static joellc.considermespiritual.Database.getDatabase;
 
 /**
  * Created by Joseph on 7/15/2018.
@@ -43,7 +53,7 @@ public class ShowQuoteFragment extends android.support.v4.app.Fragment {
         @BindView(R.id.author) TextView authorTextView;
         @BindView(R.id.heart_button) LikeButton likeButton;
         @BindView(R.id.delete_button) ImageView deleteButton;
-
+        @BindView(R.id.tagViewHorizontalLayout) LinearLayout tagViewLayout;
         public DynamicCardView(View view) {
             ButterKnife.bind(this, view);
         }
@@ -56,8 +66,12 @@ public class ShowQuoteFragment extends android.support.v4.app.Fragment {
 
     @BindView(R.id.buttonFindQuote) Button findQuote;
     @BindView(R.id.viewStubQuoteCard) ViewStub cardView;
+    @BindView(R.id.buttonAddTag) Button buttonAddTag;
+    @BindView(R.id.autoCompleteTextViewTag) AutoCompleteTextView editTextAddTag;
+
 
     DynamicCardView dynamicCardView;
+    String quoteId = null;
 
     @Override
     public void onAttach(Context context) {
@@ -70,11 +84,14 @@ public class ShowQuoteFragment extends android.support.v4.app.Fragment {
 
     }
 
+
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         EventBus.getDefault().register(this);
+
     }
 
     @Nullable
@@ -85,6 +102,21 @@ public class ShowQuoteFragment extends android.support.v4.app.Fragment {
 
         ButterKnife.bind(this, view);
 
+        buttonAddTag.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "You pressed the add tag button");
+
+                String tag = editTextAddTag.getText().toString();
+
+                Log.d(TAG, "The tag you want to insert is: " + tag);
+
+                TagAbstractionLayer.addTag(getContext(), quoteId, tag);
+
+                editTextAddTag.setText("");
+            }
+        });
+
         View stubView = cardView.inflate();
 
 
@@ -94,6 +126,9 @@ public class ShowQuoteFragment extends android.support.v4.app.Fragment {
             @Override
             public void run() {
                 SpiritualToken sp = getNewQuote();
+                Log.d(TAG, "updating the quoteId");
+                quoteId = sp.getID();
+                Log.d(TAG, "quoteId:" + quoteId);
                 showNewQuote(sp);
             }
         };
@@ -114,14 +149,12 @@ public class ShowQuoteFragment extends android.support.v4.app.Fragment {
 
         Log.d(TAG, "Getting a random quote!");
 
-        result = Database.getDatabase(getActivity().getApplicationContext())
+        result = getDatabase(getActivity().getApplicationContext())
                 .spiritualTokenDao().getSpiritualToken();
          Log.d(TAG, "Is the result equal to null? " + result);
 
          return result;
     }
-
-
 
     /**
      * Method to replace the quote that is show on the screen
@@ -133,6 +166,10 @@ public class ShowQuoteFragment extends android.support.v4.app.Fragment {
             String quote = spiritualToken.getQuote();
             String author = spiritualToken.getAuthor();
 
+            quoteId = spiritualToken.getID();
+
+
+
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -140,6 +177,8 @@ public class ShowQuoteFragment extends android.support.v4.app.Fragment {
 
                     dynamicCardView.quoteTextView.setText(quote);
                     dynamicCardView.authorTextView.setText(author);
+
+
                 }
             });
         } else {
@@ -183,6 +222,30 @@ public class ShowQuoteFragment extends android.support.v4.app.Fragment {
 
     }
 
+    // TODO: IMPLEMENT AUTOFILL
+    /*
+    private ArrayAdapter<String> getTagsAdapter(Context context) {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // Get all the tags from the Database
+                List<Tags> tags = Database.getDatabase(getActivity().getApplicationContext()).tagsDao().getTags();
+
+                List <String> stringTags = null;
+
+                // Move all the string tags into
+                for (Tags x : tags) {
+                    stringTags.add(x.getTag());
+                }
+
+            }
+        }).start();
+
+
+    }
+    */
+
     /**
      * When the button on the street is short clicked
      */
@@ -194,12 +257,100 @@ public class ShowQuoteFragment extends android.support.v4.app.Fragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                SpiritualToken sp = Database.getDatabase(getActivity().getApplicationContext())
+                SpiritualToken sp = getDatabase(getActivity().getApplicationContext())
                         .spiritualTokenDao().getSpiritualToken();
 
+
                 showNewQuote(sp);
+
+
+                // Load the tags from the database
+                List<Integer> listTagIndexes = Database.getDatabase(getActivity().getApplicationContext()).tagMapDao()
+                        .getTagMap(sp.getID());
+
+                showNewTags(sp);
+
+                // Check to see if we returned any tags
+                if (listTagIndexes.isEmpty()) {
+                    // zero tags
+                    Log.d(TAG, "There are no tags!");
+                } else {
+                    // WE HAVE TAGS
+                    // LETS GET THEM
+
+                    List<Tags> tagz = Database.getDatabase(getActivity().getApplicationContext()).tagsDao().getSpecificTags(listTagIndexes);
+
+                    Log.d(TAG, "You have " + listTagIndexes.size() + " tags!");
+
+                    // Let's loop through them to display them
+                    for (Tags x : tagz) {
+                        Log.d(TAG, "TAG: " + x.getTag());
+                    }
+
+                    // TODO: Add some displaying mechanic for that tags
+                }
             }
         }).start();
+    }
+
+    private void getTags(SpiritualToken sp) {
+
+        Log.d(TAG, "getting the tags");
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<Integer> listOfTagIndices = getDatabase(getContext()).tagMapDao().getTagMap(sp.getID());
+
+                // TODO: Will only show 1 tag, I don't know you
+                if (!listOfTagIndices.isEmpty()) {
+                    List<Tags> tags = getDatabase(getContext()).tagsDao().getSpecificTags(listOfTagIndices);
+
+                    // Change the views, this has to run on the UI thread
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d(TAG, "I am so deeeeep");
+
+                            // Run through all the tags
+                            for (Tags x : tags) {
+                                Log.d(TAG, "We are adding another textview");
+                                final TextView texty = new TextView(getContext());
+
+                                texty.setText(x.getTag());
+
+                                dynamicCardView.tagViewLayout.addView(texty);
+                            }
+                        }
+                    });
+                }
+            }
+        }).start();
+    }
+
+    /**
+     * This method will show the new tags, just pass it the spiritual token that you want to tags for
+     * @param sp The spiritual token that you want the tags for
+     */
+    private void showNewTags(SpiritualToken sp) {
+
+        // Check to see if views exist inside and delete them if so
+        if (dynamicCardView.tagViewLayout.getChildCount() > 0) {
+            Log.d(TAG, "There are some views, let's delete them");
+
+            // To remove all the views, we need to remove them from the UI thread
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    dynamicCardView.tagViewLayout.removeAllViews();
+                }
+            });
+
+        }
+
+        Log.d(TAG, "Calling getTags");
+        getTags(sp);
+
     }
 
     /**
@@ -219,5 +370,8 @@ public class ShowQuoteFragment extends android.support.v4.app.Fragment {
 
         SpiritualToken sp = getNewQuote();
         showNewQuote(sp);
+
+        Log.d(TAG, "Calling showNewTags");
+        showNewTags(sp);
     }
 }

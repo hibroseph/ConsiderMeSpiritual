@@ -70,17 +70,19 @@ public class AddQuoteFragment extends Fragment {
                 checkBoxScripture.isChecked()
         );
 
+        SpiritualTokenAL.addSpiritualToken(getActivity(), sp);
+
         Log.d(TAG, "The ID is: " + sp.getID());
 
         // Add to the database
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Database.getDatabase(getActivity().getApplicationContext()).spiritualTokenDao()
-                        .addSpiritualToken(sp);
-
-            }
-        }).start();
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                Database.getDatabase(getActivity().getApplicationContext()).spiritualTokenDao()
+//                        .addSpiritualToken(sp);
+//
+//            }
+//        }).start();
 
         // Toast for user feedback
         Toast.makeText(getActivity(), "Added To Collection", Toast.LENGTH_SHORT).show();

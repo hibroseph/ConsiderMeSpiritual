@@ -27,7 +27,6 @@ public class SpiritualToken {
         quote = "NA";
         author = "NA";
         favorite = false;
-        tags = new ArrayList<>();
     }
 
     @Ignore
@@ -37,7 +36,6 @@ public class SpiritualToken {
         this.quote = quote;
         this.favorite = favorite;
         this.scripture = scripture;
-        tags = new ArrayList<>();
     }
 
     // This will be the Firebase ID
@@ -55,16 +53,6 @@ public class SpiritualToken {
 
     @ColumnInfo
     private boolean favorite;
-
-    // I don't want the table that will be holding the spiritual tokens to hold the list of tags
-    // The tags will be held on a different table.
-    @Ignore
-    private List<String> tags;
-
-    public List<String> getTags() { return tags; }
-
-    @NonNull
-    public void addTag(String tag) { tags.add(tag); }
 
     @NonNull
     public String getID() { return ID; }

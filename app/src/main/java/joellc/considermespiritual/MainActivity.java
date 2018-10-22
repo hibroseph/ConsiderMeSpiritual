@@ -3,8 +3,10 @@ package joellc.considermespiritual;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -25,6 +27,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 //TODO: Adding settings to give options like changing color and clearing the database
@@ -39,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
     private String TAG;
 
     private FirebaseDatabase firebaseDatabase;
-
 
     // The icons for the tabs
     private int[] tabIcons = {
@@ -76,13 +78,49 @@ public class MainActivity extends AppCompatActivity {
         // Get from the Shared preferences the last downloaded ID and find how many quotes there are to download
         findNumOfQuotesToDownload((prefs.getString("LAST_DOWNLOADED", null)));
 
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // Set up the reference to the app database
+
+            }
+        }).start();
+
         // Displays the size of the table
         new Thread(new Runnable() {
             @Override
             public void run() {
+                //int size = Database.getDatabase(getApplicationContext()).spiritualTokenDao().getSize();
                 int size = Database.getDatabase(getApplicationContext()).spiritualTokenDao().getSize();
 
                 Log.d(TAG, "The size of the table is: " + size);
+            }
+        }).start();
+
+        //TODO: REMOVE THIS IS DEVELOPMENTAL AREA FOR TESTING TAGS
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                Database.getDatabase(getApplicationContext()).tagsDao().addTag(new Tags("Love"));
+                Database.getDatabase(getApplicationContext()).tagsDao().addTag(new Tags("Prophet"));
+
+                Database.getDatabase(getApplicationContext()).tagMapDao().addTagMap(new TagMap(1,"-LGOEw0NW3Cf7YzNaFtS"));
+                Database.getDatabase(getApplicationContext()).tagMapDao().addTagMap(new TagMap(1,"-LGOEw0XkBNLAAPgv2uz"));
+
+                Database.getDatabase(getApplicationContext()).tagMapDao().addTagMap(new TagMap(2, "-LGOEw0pdfHOPML0rPIb"));
+
+                List <Tags> tags = Database.getDatabase(getApplicationContext()).tagsDao().getTags();
+
+                for (joellc.considermespiritual.Tags Tagz: tags) {
+                    Log.d(TAG, "TAG: " + Tagz.getTag());
+                }
+
+                ArrayList<SpiritualToken> sp  = (ArrayList<SpiritualToken>) Database.getDatabase(getApplicationContext()).spiritualTokenDao().getSpiritualTokenWithTags(Arrays.asList("Love"));
+
+                for (SpiritualToken x : sp) {
+                    Log.d(TAG, "Quote: " + x.getQuote());
+                }
             }
         }).start();
     }

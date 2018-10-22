@@ -10,7 +10,9 @@ import android.arch.persistence.room.RoomDatabase;
  * app. Created by following the structure on the app development page
  * https://developer.android.com/training/data-storage/room/
  */
-@Database(entities = {SpiritualToken.class}, version = 1)
+@Database(entities = {SpiritualToken.class, TagMap.class, Tags.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract SpiritualTokenDao spiritualTokenDao();
+    public abstract TagMapDao tagMapDao();
+    public abstract TagsDao tagsDao();
 }

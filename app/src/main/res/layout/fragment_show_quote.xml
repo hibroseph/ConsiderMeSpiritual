@@ -14,33 +14,56 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginBottom="108dp"
+        android:layout_marginBottom="64dp"
 
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginEnd="44dp"
         android:backgroundTint="@color/colorPrimary"
         android:gravity="center"
         android:text="@string/show_quote_button_find"
         android:textColor="#FFFFFF"
         card_view:layout_constraintBottom_toBottomOf="parent"
-        card_view:layout_constraintEnd_toEndOf="parent"
-        card_view:layout_constraintStart_toStartOf="parent" />
+        card_view:layout_constraintEnd_toEndOf="parent" />
 
     <ViewStub
         android:id="@+id/viewStubQuoteCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout="@layout/cardview_quote"
-        card_view:layout_constraintBottom_toTopOf="@+id/buttonFindQuote"
         card_view:layout_constraintEnd_toEndOf="parent"
-        card_view:layout_constraintHorizontal_bias="0.021"
+        card_view:layout_constraintHorizontal_bias="0.02"
         card_view:layout_constraintStart_toStartOf="parent"
-        card_view:layout_constraintTop_toTopOf="parent"
-        card_view:layout_constraintVertical_bias="0.083" />
+        card_view:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/buttonAddTag"
+        android:layout_width="104dp"
+        android:layout_height="45dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:text="Add Tag"
+        card_view:layout_constraintBottom_toBottomOf="@+id/buttonFindQuote"
+        card_view:layout_constraintEnd_toStartOf="@+id/buttonFindQuote"
+        card_view:layout_constraintStart_toStartOf="parent"
+        card_view:layout_constraintTop_toTopOf="@+id/buttonFindQuote"
+        card_view:layout_constraintVertical_bias="0.0" />
+
+    <AutoCompleteTextView
+        android:id="@+id/autoCompleteTextViewTag"
+        android:layout_width="296dp"
+        android:layout_height="46dp"
+        android:layout_marginBottom="12dp"
+        android:layout_marginStart="8dp"
+        android:completionHint="Tags"
+        android:hint="New Tag"
+        android:inputType="textCapWords"
+        card_view:layout_constraintBottom_toTopOf="@+id/buttonAddTag"
+        card_view:layout_constraintEnd_toEndOf="@+id/buttonFindQuote"
+        card_view:layout_constraintHorizontal_bias="1.0"
+        card_view:layout_constraintStart_toStartOf="@+id/buttonAddTag" />
 
 
 </android.support.constraint.ConstraintLayout>

@@ -46,6 +46,12 @@
                 android:textStyle="italic" />
 
             <LinearLayout
+                android:id="@+id/tagViewHorizontalLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"></LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/cardViewHorizontalLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

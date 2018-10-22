@@ -17,7 +17,7 @@
     <!-- Preferences/Settings -->
     <string name="setting_title_quotes">Quotes</string>
     <string name="setting_title_new_quotes">Check for New Quotes</string>
-    <string name="setting_key_new_quotes">setting_key_new_quotes</string>
+    <string name="setting_key_new_quotes">new_quote_key</string>
     <string name="setting_summary_new_quotes">Checks for New Quotes Online</string>
 
     <string name="setting_title_general">General</string>
@@ -27,5 +27,9 @@
 
     <string name="setting_title_created_by">Created By Joe</string>
     <string name="setting_title_version">Version: 1.0</string>
+
+    <string name="setting_title_delete">Delete All Quotes</string>
+    <string name="setting_key_delete">delete_key</string>
+    <string name="setting_summary_delete">Want to remove all the quotes?</string>
 
 </resources>

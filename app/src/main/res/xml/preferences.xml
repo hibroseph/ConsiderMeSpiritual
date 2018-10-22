@@ -1,17 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-
-
-    <PreferenceCategory android:title="@string/setting_title_quotes">
-
-        <Preference
-            android:title="@string/setting_title_new_quotes"
-            android:key="@string/setting_key_new_quotes"
-            android:summary="@string/setting_summary_new_quotes"/>
-
-    </PreferenceCategory>
-
     <PreferenceCategory android:title="General">
 
         <EditTextPreference
@@ -20,6 +9,24 @@
             android:selectAllOnFocus="true"
             android:singleLine="false"
             android:title="@string/setting_title_feedback" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/setting_title_quotes">
+
+        <Preference
+            android:title="@string/setting_title_new_quotes"
+            android:key="@string/setting_key_new_quotes"
+            android:summary="@string/setting_summary_new_quotes"/>
+
+        <Preference
+            android:title="@string/setting_title_delete"
+            android:key="@string/setting_key_delete"
+            android:summary="@string/setting_summary_delete"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="About">
 
         <Preference
             android:selectable="false"
@@ -30,7 +37,6 @@
             android:selectable="false"
             android:enabled="true"
             android:title="@string/setting_title_created_by"/>
-
 
     </PreferenceCategory>
 

@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 1,
-    "identityHash": "bdd0f0707d5b2cb05ffaec59c4b03730",
+    "version": 2,
+    "identityHash": "7e6c9621c059d31640bab53a3eb907b3",
     "entities": [
       {
         "tableName": "SpiritualToken",
@@ -76,7 +76,7 @@
       },
       {
         "tableName": "Tags",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`Tag` TEXT NOT NULL, `TagId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`Tag` TEXT NOT NULL, `TagId` INTEGER NOT NULL, PRIMARY KEY(`TagId`))",
         "fields": [
           {
             "fieldPath": "Tag",
@@ -95,7 +95,7 @@
           "columnNames": [
             "TagId"
           ],
-          "autoGenerate": true
+          "autoGenerate": false
         },
         "indices": [],
         "foreignKeys": []
@@ -103,7 +103,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"bdd0f0707d5b2cb05ffaec59c4b03730\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"7e6c9621c059d31640bab53a3eb907b3\")"
     ]
   }
 }

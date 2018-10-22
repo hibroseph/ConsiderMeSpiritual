@@ -18,6 +18,14 @@ import java.util.List;
 @Dao
 public interface SpiritualTokenDao {
 
+    // Query for finding spiritual tokens with a list of tags
+    @Query("SELECT * " +
+            "FROM SpiritualToken sp, TagMap tm, Tags t " +
+            "WHERE tm.TagId = t.TagId " +
+            "AND (t.Tag IN (:tags) )" +
+            "AND sp.ID = tm.SpiritualTokenId ")
+    List<SpiritualToken> getSpiritualTokenWithTags(List<String> tags);
+
     // Get how many rows exist to help debug issue with Firebase
     @Query("SELECT COUNT(*) FROM SpiritualToken")
     int getSize();
